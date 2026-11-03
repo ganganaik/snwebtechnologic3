@@ -1,4 +1,28 @@
+import { useState } from "react";
+import { db } from "./firebase";
+import { collection, addDoc } from "firebase/firestore";
 function App() {
+  const [form, setForm] = useState({
+  name: "",
+  mobile: "",
+  email: "",
+  service: "",
+  details: ""
+});
+
+const submitOrder = async () => {
+  await addDoc(collection(db, "orders"), form);
+
+  alert("Order Submitted Successfully!");
+
+  setForm({
+    name: "",
+    mobile: "",
+    email: "",
+    service: "",
+    details: ""
+  });
+};
   return (
     <div className="app">
 
@@ -71,20 +95,43 @@ function App() {
 
   <p>Fill the details and we will contact you.</p>
 
-  <input type="text" placeholder="Your Name" />
+  <input
+  type="text"
+  placeholder="Your Name"
+  value={form.name}
+  onChange={(e) =>
+    setForm({...form, name: e.target.value})
+  }
+/>
+  <input
+  type="tel"
+  placeholder="Mobile Number"
+  value={form.mobile}
+  onChange={(e) =>
+    setForm({...form, mobile: e.target.value})
+  }
+/>
 
-  <input type="tel" placeholder="Mobile Number" />
+  <input
+  type="email"
+  placeholder="Email Address"
+  value={form.email}
+  onChange={(e) =>
+    setForm({...form, email: e.target.value})
+  }
+/>
 
-  <input type="email" placeholder="Email Address" />
-
-  <select>
-    <option>Choose Service</option>
-    <option>Website Development</option>
-    <option>Web Design</option>
-    <option>Business Solution</option>
-  </select>
-
-  <textarea placeholder="Tell us about your project"></textarea>
+<select
+  value={form.service}
+  onChange={(e) =>
+    setForm({...form, service: e.target.value})
+  }
+>
+  <option>Choose Service</option>
+  <option>Website Development</option>
+  <option>Web Design</option>
+  <option>Business Solution</option>
+</select>   <textarea placeholder="Tell us about your project"></textarea>
 
   <button>
     Submit Order
