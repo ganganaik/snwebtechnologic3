@@ -1,7 +1,9 @@
+import { Routes, Route } from "react-router-dom";
+import Admin from "./pages/Admin";
 import { useState } from "react";
 import { db } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
-function App() {
+function Home() {
   const [form, setForm] = useState({
   name: "",
   mobile: "",
@@ -173,6 +175,14 @@ const submitOrder = async () => {
       </footer>
 
     </div>
+  );
+}
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/admin" element={<Admin />} />
+    </Routes>
   );
 }
 
