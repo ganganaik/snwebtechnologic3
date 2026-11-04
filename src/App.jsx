@@ -1,3 +1,4 @@
+import AdminLogin from "./pages/AdminLogin";
 import { Routes, Route } from "react-router-dom";
 import Admin from "./pages/Admin";
 import { useState } from "react";
@@ -181,6 +182,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/admin" element={<Admin />} />
     </Routes>
   );
