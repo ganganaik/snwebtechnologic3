@@ -131,11 +131,19 @@ const submitOrder = async () => {
   <option>Website Development</option>
   <option>Web Design</option>
   <option>Business Solution</option>
-</select>   <textarea placeholder="Tell us about your project"></textarea>
+</select>   <textarea
+  placeholder="Tell us about your project"
+  value={form.details}
+  onChange={(e) =>
+    setForm({ ...form, details: e.target.value })
+  }
+/>
 
-  <button>
-    Submit Order
-  </button>
+
+  <button onClick={submitOrder}>
+  Submit Order
+</button>
+
 
 
   <div className="payment">
