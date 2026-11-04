@@ -1,9 +1,10 @@
-import AdminLogin from "./pages/AdminLogin";
 import { Routes, Route } from "react-router-dom";
 import Admin from "./pages/Admin";
 import { useState } from "react";
 import { db } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
+import AdminLogin from "./pages/Adminlogin";
+import ProtectedRoute from "./pages/ProtectedRoute";
 function Home() {
   const [form, setForm] = useState({
   name: "",
@@ -181,10 +182,17 @@ const submitOrder = async () => {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/admin-login" element={<AdminLogin />} />
-      <Route path="/admin" element={<Admin />} />
-    </Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/admin-login" element={<AdminLogin />} />
+  <Route
+    path="/admin"
+    element={
+      <ProtectedRoute>
+        <Admin />
+      </ProtectedRoute>
+    }
+  />
+</Routes>
   );
 }
 
