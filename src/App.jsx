@@ -1,8 +1,11 @@
-import { Routes, Route } from "react-router-dom";
-import Admin from "./pages/Admin";
-import { useState } from "react";
-import { db } from "./firebase";
+
+import { Routes, Route, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { db, auth } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
+
+import Admin from "./pages/Admin";
 import AdminLogin from "./pages/Adminlogin";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import CustomerSignup from "./pages/CustomerSignup";
@@ -10,6 +13,7 @@ import CustomerLogin from "./pages/CustomerLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import CustomerProfile from "./pages/CustomerProfile";
 import MyOrders from "./pages/MyOrders";
+
 function Home() {
   const [form, setForm] = useState({
     name: "",
@@ -20,17 +24,22 @@ function Home() {
   });
 
   const submitOrder = async () => {
-    await addDoc(collection(db, "orders"), form);
+    try {
+      await addDoc(collection(db, "orders"), form);
 
-    alert("Order Submitted Successfully!");
+      alert("Order Submitted Successfully!");
 
-    setForm({
-      name: "",
-      mobile: "",
-      email: "",
-      service: "",
-      details: ""
-    });
+      setForm({
+        name: "",
+        mobile: "",
+        email: "",
+        service: "",
+        details: ""
+      });
+    } catch (error) {
+      alert("Unable to submit order. Please try again.");
+      console.error(error);
+    }
   };
 
   return (
@@ -43,6 +52,8 @@ function Home() {
           <a href="#">Services</a>
           <a href="#">About</a>
           <a href="#">Contact</a>
+          <Link to="/customer-profile">My Profile</Link>
+          <Link to="/my-orders">My Orders</Link>
         </div>
       </nav>
 
@@ -119,7 +130,7 @@ function Home() {
             setForm({ ...form, service: e.target.value })
           }
         >
-          <option>Choose Service</option>
+          <option value="">Choose Service</option>
           <option>Website Development</option>
           <option>Web Design</option>
           <option>Business Solution</option>
@@ -161,35 +172,123 @@ function Home() {
   );
 }
 
+function Welcome() {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "#f3f4f6",
+      fontFamily: "Arial",
+      padding: "20px"
+    }}>
+      <div style={{
+        background: "white",
+        padding: "35px",
+        borderRadius: "15px",
+        width: "100%",
+        maxWidth: "400px",
+        textAlign: "center",
+        boxShadow: "0 4px 15px rgba(0,0,0,0.1)"
+      }}>
+        <h2>SN WEB TECHNOLOGIES</h2>
+
+        <h3>Welcome!</h3>
+
+        <p>Welcome to our website.</p>
+
+        <p>Already have an account?</p>
+
+        <Link to="/customer-login" style={{
+          display: "block",
+          padding: "13px",
+          background: "#111827",
+          color: "white",
+          textDecoration: "none",
+          borderRadius: "7px",
+          marginBottom: "20px"
+        }}>
+          Customer Login
+        </Link>
+
+        <p>New to SN WEB TECHNOLOGIES?</p>
+
+        <Link to="/customer-signup" style={{
+          display: "block",
+          padding: "13px",
+          background: "#2563eb",
+          color: "white",
+          textDecoration: "none",
+          borderRadius: "7px"
+        }}>
+          Create New Account
+        </Link>
+
+        <p style={{ marginTop: "25px" }}>
+          <Link to="/admin-login">
+            Admin Login
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function HomeGate() {
+  const [user, setUser] = useState(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setChecking(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (checking) {
+    return <p style={{ textAlign: "center" }}>Loading...</p>;
+  }
+
+  return user ? <Home /> : <Welcome />;
+}
+
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomeGate />} />
 
       <Route
         path="/customer-signup"
         element={<CustomerSignup />}
       />
-       <Route
-  path="/customer-login"
-  element={<CustomerLogin />}
-/>
 
-<Route
-  path="/forgot-password"
-  element={<ForgotPassword />}
-/>
+      <Route
+        path="/customer-login"
+        element={<CustomerLogin />}
+      />
 
-<Route
-  path="/customer-profile"
-  element={<CustomerProfile />}
-/>
+      <Route
+        path="/forgot-password"
+        element={<ForgotPassword />}
+      />
 
-<Route
-  path="/my-orders"
-  element={<MyOrders />}
-/>
-      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route
+        path="/customer-profile"
+        element={<CustomerProfile />}
+      />
+
+      <Route
+        path="/my-orders"
+        element={<MyOrders />}
+      />
+
+      <Route
+        path="/admin-login"
+        element={<AdminLogin />}
+      />
 
       <Route
         path="/admin"
