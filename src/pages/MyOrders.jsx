@@ -36,7 +36,7 @@ function MyOrders() {
         setOrders(customerOrders);
       } catch (err) {
         console.error("My Orders Error:", err);
-        setError("Unable to load your orders. Please try again.");
+        setError(err.code + ": " + err.message);
       } finally {
         setLoading(false);
       }
@@ -46,7 +46,11 @@ function MyOrders() {
   }, []);
 
   if (loading) {
-    return <p>Loading your orders...</p>;
+    return (
+      <div style={{ padding: "30px", color: "#111827" }}>
+        Loading your orders...
+      </div>
+    );
   }
 
   return (
@@ -54,6 +58,7 @@ function MyOrders() {
       minHeight: "100vh",
       padding: "25px",
       background: "#f3f4f6",
+      color: "#111827",
       fontFamily: "Arial"
     }}>
       <h2 style={{ textAlign: "center" }}>
@@ -65,8 +70,13 @@ function MyOrders() {
       </h3>
 
       {error && (
-        <p style={{ color: "red", textAlign: "center" }}>
-          {error}
+        <p style={{
+          color: "red",
+          background: "white",
+          padding: "15px",
+          overflowWrap: "anywhere"
+        }}>
+          Error: {error}
         </p>
       )}
 
@@ -85,22 +95,19 @@ function MyOrders() {
             key={order.id}
             style={{
               background: "white",
+              color: "#111827",
               padding: "20px",
               marginBottom: "15px",
-              borderRadius: "10px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+              borderRadius: "10px"
             }}
           >
             <h3>{order.service}</h3>
-
             <p><b>Name:</b> {order.name}</p>
             <p><b>Email:</b> {order.email}</p>
             <p><b>Mobile:</b> {order.mobile}</p>
             <p><b>Details:</b> {order.details}</p>
-
             <p>
-              <b>Status:</b>{" "}
-              {order.status || "Pending"}
+              <b>Status:</b> {order.status || "Pending"}
             </p>
           </div>
         ))}
