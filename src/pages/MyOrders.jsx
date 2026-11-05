@@ -35,6 +35,7 @@ function MyOrders() {
 
         setOrders(customerOrders);
       } catch (err) {
+        console.error("My Orders Error:", err);
         setError("Unable to load your orders. Please try again.");
       } finally {
         setLoading(false);
