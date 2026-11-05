@@ -170,7 +170,25 @@ function App() {
         path="/customer-signup"
         element={<CustomerSignup />}
       />
+       <Route
+  path="/customer-login"
+  element={<CustomerLogin />}
+/>
 
+<Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
+<Route
+  path="/customer-profile"
+  element={<CustomerProfile />}
+/>
+
+<Route
+  path="/my-orders"
+  element={<MyOrders />}
+/>
       <Route path="/admin-login" element={<AdminLogin />} />
 
       <Route
