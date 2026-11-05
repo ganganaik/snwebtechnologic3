@@ -1,11 +1,18 @@
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 function Admin() {const [orders, setOrders] = useState([]);
-const handleLogout = async () => {
+const updateOrderStatus = async (id, status) => {
+  await updateDoc(doc(db, "orders", id), {
+    status: status,
+  });
+
+  loadOrders();
+};
+  const handleLogout = async () => {
   await signOut(auth);
 };
 useEffect(() => {
@@ -50,6 +57,7 @@ const loadOrders = async () => {
             <th>Email</th>
             <th>Service</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
 
@@ -67,7 +75,16 @@ const loadOrders = async () => {
         <td>{order.mobile}</td>
         <td>{order.email}</td>
         <td>{order.service}</td>
-        <td>Pending</td>
+        <td>
+  <select
+    value={order.status || "Pending"}
+    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+  >
+    <option value="Pending">Pending</option>
+    <option value="In Progress">In Progress</option>
+    <option value="Completed">Completed</option>
+  </select>
+</td>
       </tr>
     ))
   )}
