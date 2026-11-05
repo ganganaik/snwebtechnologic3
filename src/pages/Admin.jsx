@@ -1,9 +1,13 @@
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 function Admin() {const [orders, setOrders] = useState([]);
-
+const handleLogout = async () => {
+  await signOut(auth);
+};
 useEffect(() => {
   loadOrders();
 }, []);
@@ -24,7 +28,9 @@ const loadOrders = async () => {
       <h1>SN WEB TECHNOLOGIES</h1>
 
       <h2>Admin Dashboard</h2>
-
+      <button onClick={handleLogout}>
+        Logout
+      </button>
       <hr />
 
       <h3>Customer Orders</h3>
