@@ -6,7 +6,10 @@ import { collection, addDoc } from "firebase/firestore";
 import AdminLogin from "./pages/Adminlogin";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import CustomerSignup from "./pages/CustomerSignup";
-
+import CustomerLogin from "./pages/CustomerLogin";
+import ForgotPassword from "./pages/ForgotPassword";
+import CustomerProfile from "./pages/CustomerProfile";
+import MyOrders from "./pages/MyOrders";
 function Home() {
   const [form, setForm] = useState({
     name: "",
