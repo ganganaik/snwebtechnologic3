@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
@@ -18,8 +19,9 @@ function ForgotPassword() {
       await sendPasswordResetEmail(auth, email);
       setMessage("Password reset link sent to your email!");
       setEmail("");
-    } catch (error) {
-      setError("Unable to send reset link. Please check your email.");
+    } catch (err) {
+      console.error("Forgot Password Error:", err);
+      setError(err.code + ": " + err.message);
     } finally {
       setLoading(false);
     }
@@ -32,15 +34,18 @@ function ForgotPassword() {
       justifyContent: "center",
       alignItems: "center",
       background: "#f3f4f6",
-      fontFamily: "Arial"
+      fontFamily: "Arial",
+      padding: "20px",
+      boxSizing: "border-box"
     }}>
       <form
         onSubmit={handleReset}
         style={{
           background: "white",
+          color: "#111827",
           padding: "30px",
           borderRadius: "12px",
-          width: "90%",
+          width: "100%",
           maxWidth: "380px",
           boxShadow: "0 4px 15px rgba(0,0,0,0.1)"
         }}
@@ -74,7 +79,12 @@ function ForgotPassword() {
         )}
 
         {error && (
-          <p style={{ color: "red" }}>{error}</p>
+          <p style={{
+            color: "red",
+            overflowWrap: "anywhere"
+          }}>
+            {error}
+          </p>
         )}
 
         <button
