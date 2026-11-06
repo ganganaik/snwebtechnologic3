@@ -158,7 +158,6 @@ function Admin() {
     const timeA = getOrderTime(a);
     const timeB = getOrderTime(b);
 
-    // Orders without a saved date stay at the bottom.
     if (timeA === null && timeB === null) return 0;
     if (timeA === null) return 1;
     if (timeB === null) return -1;
@@ -176,6 +175,64 @@ function Admin() {
     if (timestamp === null) return "Date not available";
 
     return new Date(timestamp).toLocaleString();
+  };
+
+  const exportOrders = () => {
+    if (filteredOrders.length === 0) {
+      alert("There are no orders to export.");
+      return;
+    }
+
+    const headers = [
+      "Customer Name",
+      "Mobile Number",
+      "Email",
+      "Service",
+      "Project Details",
+      "Order Date",
+      "Order Status",
+      "Order ID",
+    ];
+
+    const escapeCSV = (value) => {
+      const text = String(value ?? "");
+      return `"${text.replace(/"/g, '""')}"`;
+    };
+
+    const rows = filteredOrders.map((order) => [
+      order.name,
+      order.mobile,
+      order.email,
+      order.service,
+      order.details,
+      formatOrderDate(order),
+      order.status || "Pending",
+      order.id,
+    ]);
+
+    const csvContent =
+      "\uFEFF" +
+      [headers, ...rows]
+        .map((row) => row.map(escapeCSV).join(","))
+        .join("\r\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `SN-Web-Technologies-Orders-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
   };
 
   const detailRow = (label, value) => (
@@ -269,6 +326,10 @@ function Admin() {
 
             <button onClick={loadOrders} style={styles.refresh}>
               Refresh Orders
+            </button>
+
+            <button onClick={exportOrders} style={styles.exportButton}>
+              ↓ Export Orders (CSV)
             </button>
           </div>
 
@@ -477,6 +538,14 @@ const styles = {
   },
   refresh: {
     background: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: "7px",
+    padding: "12px 18px",
+    cursor: "pointer",
+  },
+  exportButton: {
+    background: "#15803d",
     color: "white",
     border: "none",
     borderRadius: "7px",
