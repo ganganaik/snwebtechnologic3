@@ -7,6 +7,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
@@ -21,6 +22,11 @@ function Admin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
+  // Bulk update states
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+  const [bulkStatus, setBulkStatus] = useState("In Progress");
+  const [bulkLoading, setBulkLoading] = useState(false);
+
   const loadOrders = async () => {
     try {
       setLoading(true);
@@ -34,6 +40,7 @@ function Admin() {
       }));
 
       setOrders(data);
+      setSelectedOrderIds([]);
     } catch (err) {
       console.error(err);
       setError("Unable to load orders. Please try again.");
@@ -83,6 +90,10 @@ function Admin() {
         previousOrders.filter((order) => order.id !== id)
       );
 
+      setSelectedOrderIds((previousIds) =>
+        previousIds.filter((orderId) => orderId !== id)
+      );
+
       setSelectedOrder((previousOrder) =>
         previousOrder?.id === id ? null : previousOrder
       );
@@ -91,6 +102,85 @@ function Admin() {
     } catch (err) {
       console.error(err);
       alert("Unable to delete order.");
+    }
+  };
+
+  // Select or deselect one order
+  const toggleOrderSelection = (id) => {
+    setSelectedOrderIds((previousIds) =>
+      previousIds.includes(id)
+        ? previousIds.filter((orderId) => orderId !== id)
+        : [...previousIds, id]
+    );
+  };
+
+  // Select or deselect all orders on current page
+  const toggleSelectAll = () => {
+    const currentPageIds = paginatedOrders.map((order) => order.id);
+
+    const allSelected = currentPageIds.every((id) =>
+      selectedOrderIds.includes(id)
+    );
+
+    if (allSelected) {
+      setSelectedOrderIds((previousIds) =>
+        previousIds.filter((id) => !currentPageIds.includes(id))
+      );
+    } else {
+      setSelectedOrderIds((previousIds) =>
+        [...new Set([...previousIds, ...currentPageIds])]
+      );
+    }
+  };
+
+  // Update all selected orders together
+  const bulkUpdateStatus = async () => {
+    if (selectedOrderIds.length === 0) {
+      alert("Please select at least one order.");
+      return;
+    }
+
+    const confirmUpdate = window.confirm(
+      `Update ${selectedOrderIds.length} selected orders to "${bulkStatus}"?`
+    );
+
+    if (!confirmUpdate) return;
+
+    try {
+      setBulkLoading(true);
+
+      const batch = writeBatch(db);
+
+      selectedOrderIds.forEach((id) => {
+        batch.update(doc(db, "orders", id), {
+          status: bulkStatus,
+        });
+      });
+
+      await batch.commit();
+
+      setOrders((previousOrders) =>
+        previousOrders.map((order) =>
+          selectedOrderIds.includes(order.id)
+            ? { ...order, status: bulkStatus }
+            : order
+        )
+      );
+
+      setSelectedOrder((previousOrder) =>
+        previousOrder && selectedOrderIds.includes(previousOrder.id)
+          ? { ...previousOrder, status: bulkStatus }
+          : previousOrder
+      );
+
+      setSelectedOrderIds([]);
+
+      alert("All selected orders updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Unable to update selected orders. Please try again.");
+    } finally {
+      setBulkLoading(false);
     }
   };
 
@@ -171,7 +261,7 @@ function Admin() {
     return timeB - timeA;
   });
 
-  // Pagination calculations
+  // Pagination
   const totalPages = Math.max(
     1,
     Math.ceil(sortedOrders.length / pageSize)
@@ -192,6 +282,12 @@ function Admin() {
     startIndex + pageSize,
     sortedOrders.length
   );
+
+  const currentPageIds = paginatedOrders.map((order) => order.id);
+
+  const allCurrentPageSelected =
+    currentPageIds.length > 0 &&
+    currentPageIds.every((id) => selectedOrderIds.includes(id));
 
   const formatOrderDate = (order) => {
     const timestamp = getOrderTime(order);
@@ -325,6 +421,7 @@ function Admin() {
               onChange={(e) => {
                 setSearch(e.target.value);
                 setCurrentPage(1);
+                setSelectedOrderIds([]);
               }}
               style={styles.input}
             />
@@ -334,6 +431,7 @@ function Admin() {
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
+                setSelectedOrderIds([]);
               }}
               style={styles.select}
             >
@@ -348,6 +446,7 @@ function Admin() {
               onChange={(e) => {
                 setSortOrder(e.target.value);
                 setCurrentPage(1);
+                setSelectedOrderIds([]);
               }}
               style={styles.select}
             >
@@ -362,6 +461,7 @@ function Admin() {
               onChange={(e) => {
                 setPageSize(Number(e.target.value));
                 setCurrentPage(1);
+                setSelectedOrderIds([]);
               }}
               style={styles.select}
               aria-label="Orders per page"
@@ -380,6 +480,51 @@ function Admin() {
             </button>
           </div>
 
+          {/* Bulk Update Controls */}
+          <div style={styles.bulkSection}>
+            <div style={styles.bulkInfo}>
+              <strong>{selectedOrderIds.length}</strong> orders selected
+            </div>
+
+            <div style={styles.bulkControls}>
+              <select
+                value={bulkStatus}
+                onChange={(e) => setBulkStatus(e.target.value)}
+                style={styles.select}
+              >
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+
+              <button
+                onClick={bulkUpdateStatus}
+                disabled={selectedOrderIds.length === 0 || bulkLoading}
+                style={{
+                  ...styles.bulkButton,
+                  ...(selectedOrderIds.length === 0 || bulkLoading
+                    ? styles.disabledButton
+                    : {}),
+                }}
+              >
+                {bulkLoading ? "Updating..." : "Update Selected Orders"}
+              </button>
+
+              <button
+                onClick={() => setSelectedOrderIds([])}
+                disabled={selectedOrderIds.length === 0 || bulkLoading}
+                style={{
+                  ...styles.clearButton,
+                  ...(selectedOrderIds.length === 0 || bulkLoading
+                    ? styles.disabledButton
+                    : {}),
+                }}
+              >
+                Clear Selection
+              </button>
+            </div>
+          </div>
+
           {loading ? (
             <p>Loading orders...</p>
           ) : error ? (
@@ -392,6 +537,14 @@ function Admin() {
               <table style={styles.table}>
                 <thead>
                   <tr>
+                    <th style={styles.th}>
+                      <input
+                        type="checkbox"
+                        checked={allCurrentPageSelected}
+                        onChange={toggleSelectAll}
+                        aria-label="Select all orders on this page"
+                      />
+                    </th>
                     <th style={styles.th}>Name</th>
                     <th style={styles.th}>Mobile</th>
                     <th style={styles.th}>Email</th>
@@ -406,13 +559,22 @@ function Admin() {
                 <tbody>
                   {sortedOrders.length === 0 ? (
                     <tr>
-                      <td colSpan="8" style={styles.empty}>
+                      <td colSpan="9" style={styles.empty}>
                         No matching orders found.
                       </td>
                     </tr>
                   ) : (
                     paginatedOrders.map((order) => (
                       <tr key={order.id}>
+                        <td style={styles.td}>
+                          <input
+                            type="checkbox"
+                            checked={selectedOrderIds.includes(order.id)}
+                            onChange={() => toggleOrderSelection(order.id)}
+                            aria-label={`Select order from ${order.name || "customer"}`}
+                          />
+                        </td>
+
                         <td style={styles.td}>{order.name}</td>
                         <td style={styles.td}>{order.mobile}</td>
                         <td style={styles.td}>{order.email}</td>
@@ -639,6 +801,48 @@ const styles = {
     padding: "12px 18px",
     cursor: "pointer",
   },
+  bulkSection: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "12px",
+    background: "#eff6ff",
+    border: "1px solid #bfdbfe",
+    borderRadius: "9px",
+    padding: "15px",
+    marginBottom: "18px",
+  },
+  bulkInfo: {
+    color: "#1e40af",
+    fontSize: "15px",
+  },
+  bulkControls: {
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    alignItems: "center",
+  },
+  bulkButton: {
+    background: "#15803d",
+    color: "white",
+    border: "none",
+    borderRadius: "7px",
+    padding: "12px 16px",
+    cursor: "pointer",
+  },
+  clearButton: {
+    background: "#64748b",
+    color: "white",
+    border: "none",
+    borderRadius: "7px",
+    padding: "12px 16px",
+    cursor: "pointer",
+  },
+  disabledButton: {
+    opacity: 0.5,
+    cursor: "not-allowed",
+  },
   tableWrapper: { overflowX: "auto", borderRadius: "10px" },
   pagination: {
     display: "flex",
@@ -679,7 +883,7 @@ const styles = {
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "1200px",
+    minWidth: "1250px",
   },
   th: {
     background: "#1e40af",
