@@ -17,6 +17,8 @@ function Admin() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("newest");
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const loadOrders = async () => {
@@ -169,6 +171,28 @@ function Admin() {
     return timeB - timeA;
   });
 
+  // Pagination calculations
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sortedOrders.length / pageSize)
+  );
+
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * pageSize;
+
+  const paginatedOrders = sortedOrders.slice(
+    startIndex,
+    startIndex + pageSize
+  );
+
+  const showingFrom =
+    sortedOrders.length === 0 ? 0 : startIndex + 1;
+
+  const showingTo = Math.min(
+    startIndex + pageSize,
+    sortedOrders.length
+  );
+
   const formatOrderDate = (order) => {
     const timestamp = getOrderTime(order);
 
@@ -298,13 +322,19 @@ function Admin() {
               type="text"
               placeholder="Search name, mobile, email or service"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               style={styles.input}
             />
 
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               style={styles.select}
             >
               <option value="All">All Orders</option>
@@ -315,13 +345,30 @@ function Admin() {
 
             <select
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
+              onChange={(e) => {
+                setSortOrder(e.target.value);
+                setCurrentPage(1);
+              }}
               style={styles.select}
             >
               <option value="newest">Latest Orders First</option>
               <option value="oldest">Oldest Orders First</option>
               <option value="nameAsc">Customer Name (A–Z)</option>
               <option value="nameDesc">Customer Name (Z–A)</option>
+            </select>
+
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              style={styles.select}
+              aria-label="Orders per page"
+            >
+              <option value={10}>10 per page</option>
+              <option value={20}>20 per page</option>
+              <option value={50}>50 per page</option>
             </select>
 
             <button onClick={loadOrders} style={styles.refresh}>
@@ -364,7 +411,7 @@ function Admin() {
                       </td>
                     </tr>
                   ) : (
-                    sortedOrders.map((order) => (
+                    paginatedOrders.map((order) => (
                       <tr key={order.id}>
                         <td style={styles.td}>{order.name}</td>
                         <td style={styles.td}>{order.mobile}</td>
@@ -410,6 +457,46 @@ function Admin() {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div style={styles.pagination}>
+              <span style={styles.paginationInfo}>
+                Showing {showingFrom}–{showingTo} of {sortedOrders.length} orders
+              </span>
+
+              <div style={styles.paginationActions}>
+                <button
+                  onClick={() => setCurrentPage(safeCurrentPage - 1)}
+                  disabled={safeCurrentPage === 1}
+                  style={{
+                    ...styles.pageButton,
+                    ...(safeCurrentPage === 1
+                      ? styles.disabledPageButton
+                      : {}),
+                  }}
+                >
+                  Previous
+                </button>
+
+                <span style={styles.pageNumber}>
+                  Page {safeCurrentPage} of {totalPages}
+                </span>
+
+                <button
+                  onClick={() => setCurrentPage(safeCurrentPage + 1)}
+                  disabled={safeCurrentPage === totalPages}
+                  style={{
+                    ...styles.pageButton,
+                    ...(safeCurrentPage === totalPages
+                      ? styles.disabledPageButton
+                      : {}),
+                  }}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </section>
@@ -553,6 +640,42 @@ const styles = {
     cursor: "pointer",
   },
   tableWrapper: { overflowX: "auto", borderRadius: "10px" },
+  pagination: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "12px",
+    marginTop: "18px",
+  },
+  paginationInfo: {
+    color: "#64748b",
+    fontSize: "14px",
+  },
+  paginationActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+  pageButton: {
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    padding: "9px 14px",
+    cursor: "pointer",
+  },
+  disabledPageButton: {
+    background: "#cbd5e1",
+    color: "#64748b",
+    cursor: "not-allowed",
+  },
+  pageNumber: {
+    color: "#334155",
+    fontSize: "14px",
+    fontWeight: "bold",
+  },
   table: {
     width: "100%",
     borderCollapse: "collapse",
