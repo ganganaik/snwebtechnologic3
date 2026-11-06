@@ -12,16 +12,32 @@ import { auth, db } from "../firebase";
 
 function Admin() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const loadOrders = async () => {
-    const querySnapshot = await getDocs(collection(db, "orders"));
+    try {
+      setLoading(true);
+      setError("");
 
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+      const querySnapshot = await getDocs(
+        collection(db, "orders")
+      );
 
-    setOrders(data);
+      const data = querySnapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      }));
+
+      setOrders(data);
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load orders. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -29,11 +45,22 @@ function Admin() {
   }, []);
 
   const updateOrderStatus = async (id, status) => {
-    await updateDoc(doc(db, "orders", id), {
-      status: status,
-    });
+    try {
+      await updateDoc(doc(db, "orders", id), {
+        status: status,
+      });
 
-    loadOrders();
+      setOrders((previousOrders) =>
+        previousOrders.map((order) =>
+          order.id === id ? { ...order, status } : order
+        )
+      );
+
+      alert("Order status updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Unable to update order status.");
+    }
   };
 
   const deleteOrder = async (id) => {
@@ -43,19 +70,53 @@ function Admin() {
 
     if (!confirmDelete) return;
 
-    await deleteDoc(doc(db, "orders", id));
+    try {
+      await deleteDoc(doc(db, "orders", id));
 
-    loadOrders();
+      setOrders((previousOrders) =>
+        previousOrders.filter((order) => order.id !== id)
+      );
 
-    alert("Order deleted successfully");
+      alert("Order deleted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Unable to delete order.");
+    }
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+      window.location.href = "/admin-login";
+    } catch (err) {
+      console.error(err);
+      alert("Logout failed. Please try again.");
+    }
   };
 
+  const filteredOrders = orders.filter((order) => {
+    const searchText = search.toLowerCase();
+
+    const matchesSearch =
+      (order.name || "").toLowerCase().includes(searchText) ||
+      (order.email || "").toLowerCase().includes(searchText) ||
+      (order.mobile || "").includes(searchText) ||
+      (order.service || "").toLowerCase().includes(searchText);
+
+    const matchesStatus =
+      statusFilter === "All" ||
+      (order.status || "Pending") === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial" }}>
+    <div style={{
+      padding: "20px",
+      fontFamily: "Arial",
+      maxWidth: "1200px",
+      margin: "auto"
+    }}>
       <h1>SN WEB TECHNOLOGIES</h1>
 
       <h2>Admin Dashboard</h2>
@@ -68,63 +129,118 @@ function Admin() {
 
       <h3>Customer Orders</h3>
 
-      <table
-        border="1"
-        cellPadding="10"
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-        }}
-      >
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Email</th>
-            <th>Service</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      <h4>Total Orders: {orders.length}</h4>
 
-        <tbody>
-          {orders.length === 0 ? (
-            <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
-                No Orders Yet
-              </td>
-            </tr>
-          ) : (
-            orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.name}</td>
-                <td>{order.mobile}</td>
-                <td>{order.email}</td>
-                <td>{order.service}</td>
+      <div style={{
+        display: "flex",
+        gap: "10px",
+        flexWrap: "wrap",
+        marginBottom: "20px"
+      }}>
+        <input
+          type="text"
+          placeholder="Search name, mobile, email or service"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            padding: "12px",
+            flex: "1",
+            minWidth: "220px"
+          }}
+        />
 
-                <td>
-                  <select
-                    value={order.status || "Pending"}
-                    onChange={(e) =>
-                      updateOrderStatus(order.id, e.target.value)
-                    }
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </td>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ padding: "12px" }}
+        >
+          <option value="All">All Orders</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
 
-                <td>
-                  <button onClick={() => deleteOrder(order.id)}>
-                    Delete
-                  </button>
-                </td>
+        <button onClick={loadOrders}>
+          Refresh Orders
+        </button>
+      </div>
+
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : error ? (
+        <div>
+          <p style={{ color: "red" }}>{error}</p>
+          <button onClick={loadOrders}>Try Again</button>
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table
+            border="1"
+            cellPadding="10"
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              minWidth: "850px"
+            }}
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Service</th>
+                <th>Project Details</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+
+            <tbody>
+              {filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center" }}>
+                    No matching orders found.
+                  </td>
+                </tr>
+              ) : (
+                filteredOrders.map((order) => (
+                  <tr key={order.id}>
+                    <td>{order.name}</td>
+                    <td>{order.mobile}</td>
+                    <td>{order.email}</td>
+                    <td>{order.service}</td>
+                    <td>{order.details || "No details provided"}</td>
+
+                    <td>
+                      <select
+                        value={order.status || "Pending"}
+                        onChange={(e) =>
+                          updateOrderStatus(
+                            order.id,
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                    </td>
+
+                    <td>
+                      <button
+                        onClick={() => deleteOrder(order.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
