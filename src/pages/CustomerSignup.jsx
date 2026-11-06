@@ -1,4 +1,5 @@
- import { useState } from "react";
+
+import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -10,12 +11,10 @@ function CustomerSignup() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
     try {
@@ -28,16 +27,12 @@ function CustomerSignup() {
       await setDoc(doc(db, "customers", result.user.uid), {
         name,
         mobile,
-        email,
+        email: result.user.email,
         createdAt: serverTimestamp(),
       });
 
-      setSuccess("Account created successfully!");
+      window.location.href = "/customer-dashboard";
 
-      setName("");
-      setMobile("");
-      setEmail("");
-      setPassword("");
     } catch (error) {
       setError(error.message);
     } finally {
@@ -112,10 +107,6 @@ function CustomerSignup() {
 
         {error && (
           <p style={{ color: "red" }}>{error}</p>
-        )}
-
-        {success && (
-          <p style={{ color: "green" }}>{success}</p>
         )}
 
         <button
