@@ -6,7 +6,7 @@ import { db, auth } from "./firebase";
 import {
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
 } from "firebase/firestore";
 
 import Admin from "./pages/Admin";
@@ -26,10 +26,12 @@ function Home() {
     mobile: "",
     email: auth.currentUser?.email || "",
     service: "",
-    details: ""
+    details: "",
   });
 
   const [loggingOut, setLoggingOut] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -44,6 +46,8 @@ function Home() {
   };
 
   const submitOrder = async () => {
+    if (submitting) return;
+
     try {
       if (
         !auth.currentUser ||
@@ -54,9 +58,24 @@ function Home() {
         return;
       }
 
+      if (
+        !form.name.trim() ||
+        !form.mobile.trim() ||
+        !form.service ||
+        !form.details.trim()
+      ) {
+        alert("Please fill in all project details.");
+        return;
+      }
+
+      setSubmitting(true);
+
       await addDoc(collection(db, "orders"), {
         ...form,
-        createdAt: serverTimestamp()
+        name: form.name.trim(),
+        mobile: form.mobile.trim(),
+        details: form.details.trim(),
+        createdAt: serverTimestamp(),
       });
 
       alert("Order Submitted Successfully!");
@@ -66,30 +85,49 @@ function Home() {
         mobile: "",
         email: auth.currentUser?.email || "",
         service: "",
-        details: ""
+        details: "",
       });
     } catch (error) {
       alert("Unable to submit order. Please try again.");
       console.error(error);
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="app">
       <nav className="navbar">
-        <h2>SN WEB TECHNOLOGIES</h2>
+        <Link to="/" className="brand" onClick={closeMenu}>
+          <span className="brand-mark">SN</span>
+          <span className="brand-name">
+            SN WEB
+            <small>TECHNOLOGIES</small>
+          </span>
+        </Link>
 
-        <div>
-          <a href="#">Home</a>
-          <a href="#">Services</a>
-          <a href="#">About</a>
-          <a href="#">Contact</a>
+        <button
+          className="menu-toggle"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
 
-          <Link to="/customer-dashboard">Dashboard</Link>
-          <Link to="/customer-profile">My Profile</Link>
-          <Link to="/my-orders">My Orders</Link>
+        <div className={`nav-links ${menuOpen ? "open" : ""}`}>
+          <a href="#home" onClick={closeMenu}>Home</a>
+          <a href="#services" onClick={closeMenu}>Services</a>
+          <a href="#about" onClick={closeMenu}>About</a>
+          <a href="#contact" onClick={closeMenu}>Contact</a>
+          <Link to="/customer-dashboard" onClick={closeMenu}>Dashboard</Link>
+          <Link to="/customer-profile" onClick={closeMenu}>My Profile</Link>
+          <Link to="/my-orders" onClick={closeMenu}>My Orders</Link>
 
           <button
+            className="nav-logout"
             onClick={handleLogout}
             disabled={loggingOut}
           >
@@ -98,114 +136,312 @@ function Home() {
         </div>
       </nav>
 
-      <section className="hero">
-        <h1>
-          Your Vision,
-          <br />
-          Our Creation
-        </h1>
+      <main>
+        <section className="hero" id="home">
+          <div className="hero-content">
+            <span className="eyebrow">
+              ✦ DIGITAL INNOVATION & WEB SOLUTIONS
+            </span>
 
-        <p>Premium Website Development Company</p>
-        <p>Founder: <b>Ganga Naik</b></p>
-        <p>📍 Mayurbhanj, Odisha, India 🇮🇳</p>
+            <h1>
+              Your Vision,
+              <br />
+              <span>Our Creation.</span>
+            </h1>
 
-        <button>Get Started</button>
-      </section>
+            <p className="hero-description">
+              We create modern, professional and powerful digital
+              experiences that help your business grow online.
+            </p>
 
-      <section className="services">
-        <h2>Our Services</h2>
+            <div className="hero-buttons">
+              <a href="#contact" className="primary-btn">
+                Start Your Project <span>→</span>
+              </a>
 
-        <div className="cards">
-          <div>
-            <h3>Website Development</h3>
-            <p>Modern & Professional Websites</p>
+              <a href="#services" className="secondary-btn">
+                Explore Services
+              </a>
+            </div>
+
+            <div className="hero-trust">
+              <span>✦ Professional Solutions</span>
+              <span>✦ Modern Designs</span>
+              <span>✦ Customer Focused</span>
+            </div>
           </div>
 
-          <div>
-            <h3>Web Design</h3>
-            <p>Premium UI/UX Designs</p>
+          <div className="hero-visual">
+            <div className="visual-glow"></div>
+            <div className="visual-card">
+              <div className="visual-top">
+                <span className="visual-dot"></span>
+                <span className="visual-dot"></span>
+                <span className="visual-dot"></span>
+                <span className="visual-label">SN DIGITAL STUDIO</span>
+              </div>
+
+              <div className="visual-content">
+                <div className="visual-icon">SN</div>
+                <span className="visual-small">CREATIVE DIGITAL SOLUTIONS</span>
+                <h2>Build Your<br /><span>Digital Future.</span></h2>
+                <div className="visual-line"></div>
+                <div className="visual-bottom">
+                  <span>DESIGN</span>
+                  <span>DEVELOP</span>
+                  <span>GROW</span>
+                </div>
+              </div>
+            </div>
+            <div className="floating-badge">
+              <span>✦</span> Ideas into Reality
+            </div>
+          </div>
+        </section>
+
+        <section className="services section-space" id="services">
+          <div className="section-heading">
+            <span className="eyebrow">WHAT WE DO</span>
+            <h2>Our <span>Services</span></h2>
+            <p>
+              Smart digital solutions designed to move your business forward.
+            </p>
           </div>
 
+          <div className="cards">
+            <article className="service-card">
+              <div className="service-icon">⌘</div>
+              <h3>Website Development</h3>
+              <p>
+                Modern and responsive websites built to represent
+                your business professionally.
+              </p>
+              <a href="#contact">Get Started →</a>
+            </article>
+
+            <article className="service-card">
+              <div className="service-icon">✧</div>
+              <h3>Web Design</h3>
+              <p>
+                Attractive user interfaces and thoughtful designs
+                for a better customer experience.
+              </p>
+              <a href="#contact">Get Started →</a>
+            </article>
+
+            <article className="service-card">
+              <div className="service-icon">↗</div>
+              <h3>Business Solutions</h3>
+              <p>
+                Digital solutions that help organize your work
+                and grow your online presence.
+              </p>
+              <a href="#contact">Get Started →</a>
+            </article>
+          </div>
+        </section>
+
+        <section className="about-section section-space" id="about">
+          <div className="about-decoration">SN</div>
+
+          <div className="about-content">
+            <span className="eyebrow">ABOUT OUR COMPANY</span>
+            <h2>Creating Digital Experiences That <span>Matter.</span></h2>
+
+            <p>
+              SN WEB TECHNOLOGIES focuses on building modern websites,
+              creative web designs and useful digital solutions.
+              Our goal is to help businesses establish a strong
+              and professional online presence.
+            </p>
+
+            <div className="about-details">
+              <div>
+                <strong>Founder</strong>
+                <span>Ganga Naik</span>
+              </div>
+              <div>
+                <strong>Location</strong>
+                <span>Mayurbhanj, Odisha, India</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="order-section section-space" id="contact">
+          <div className="section-heading">
+            <span className="eyebrow">LET'S WORK TOGETHER</span>
+            <h2>Start Your <span>Project</span></h2>
+            <p>
+              Tell us about your idea. Submit your project details
+              and take the first step.
+            </p>
+          </div>
+
+          <div className="order-layout">
+            <div className="order-info">
+              <h3>Have an idea?</h3>
+              <p>
+                We would love to hear about your project.
+                Share your requirements using the form.
+              </p>
+
+              <div className="info-item">
+                <span>✦</span>
+                <div>
+                  <strong>Professional Work</strong>
+                  <small>Modern and thoughtful solutions</small>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <span>✦</span>
+                <div>
+                  <strong>Customer First</strong>
+                  <small>Your requirements matter to us</small>
+                </div>
+              </div>
+
+              <div className="info-item">
+                <span>✦</span>
+                <div>
+                  <strong>Based in Odisha</strong>
+                  <small>Mayurbhanj, Odisha, India</small>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-form">
+              <h3>Project Enquiry Form</h3>
+
+              <label htmlFor="customer-name">Your Name</label>
+              <input
+                id="customer-name"
+                type="text"
+                placeholder="Enter your full name"
+                value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
+              />
+
+              <label htmlFor="customer-mobile">Mobile Number</label>
+              <input
+                id="customer-mobile"
+                type="tel"
+                placeholder="Enter your mobile number"
+                value={form.mobile}
+                onChange={(e) =>
+                  setForm({ ...form, mobile: e.target.value })
+                }
+              />
+
+              <label htmlFor="customer-email">Email Address</label>
+              <input
+                id="customer-email"
+                type="email"
+                value={form.email}
+                readOnly
+                id="customer-email"
+              />
+
+              <label htmlFor="customer-service">Choose Service</label>
+              <select
+                id="customer-service"
+                value={form.service}
+                onChange={(e) =>
+                  setForm({ ...form, service: e.target.value })
+                }
+              >
+                <option value="">Select a service</option>
+                <option>Website Development</option>
+                <option>Web Design</option>
+                <option>Business Solution</option>
+              </select>
+
+              <label htmlFor="project-details">Project Details</label>
+              <textarea
+                id="project-details"
+                placeholder="Describe your project and requirements..."
+                value={form.details}
+                onChange={(e) =>
+                  setForm({ ...form, details: e.target.value })
+                }
+              />
+
+              <button
+                className="submit-btn"
+                onClick={submitOrder}
+                disabled={submitting}
+              >
+                {submitting ? "Submitting..." : "Submit Project Enquiry →"}
+              </button>
+
+              <small className="form-note">
+                Your account email will be used for this enquiry.
+              </small>
+            </div>
+          </div>
+        </section>
+
+        <section className="payment-section section-space">
+          <div className="payment-card">
+            <span className="eyebrow">PAYMENT INFORMATION</span>
+            <h2>Simple & Secure <span>Payment</span></h2>
+            <p>
+              Use the UPI details below for payment.
+              Please confirm the project amount before making payment.
+            </p>
+
+            <div className="upi-box">
+              <span>UPI ID</span>
+              <strong>7846944419@ybl</strong>
+            </div>
+
+            <div className="qr">
+              QR CODE WILL BE ADDED SOON
+            </div>
+
+            <small>
+              Please verify the recipient details in your payment app
+              before confirming any transaction.
+            </small>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer">
+        <div className="footer-main">
           <div>
-            <h3>Business Solutions</h3>
-            <p>Grow your business online</p>
+            <div className="footer-brand">SN WEB TECHNOLOGIES</div>
+            <p>
+              Building modern digital experiences
+              for a better online future.
+            </p>
+          </div>
+
+          <div className="footer-links">
+            <strong>Quick Links</strong>
+            <a href="#home">Home</a>
+            <a href="#services">Services</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+          </div>
+
+          <div className="footer-links">
+            <strong>Customer Area</strong>
+            <Link to="/customer-dashboard">Dashboard</Link>
+            <Link to="/customer-profile">My Profile</Link>
+            <Link to="/my-orders">My Orders</Link>
+            <Link to="/order-history">Order History</Link>
           </div>
         </div>
-      </section>
 
-      <section className="order">
-        <h2>Start Your Project</h2>
-
-        <p>Fill the details and we will contact you.</p>
-
-        <input
-          type="text"
-          placeholder="Your Name"
-          value={form.name}
-          onChange={(e) =>
-            setForm({ ...form, name: e.target.value })
-          }
-        />
-
-        <input
-          type="tel"
-          placeholder="Mobile Number"
-          value={form.mobile}
-          onChange={(e) =>
-            setForm({ ...form, mobile: e.target.value })
-          }
-        />
-
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={form.email}
-          readOnly
-        />
-
-        <select
-          value={form.service}
-          onChange={(e) =>
-            setForm({ ...form, service: e.target.value })
-          }
-        >
-          <option value="">Choose Service</option>
-          <option>Website Development</option>
-          <option>Web Design</option>
-          <option>Business Solution</option>
-        </select>
-
-        <textarea
-          placeholder="Tell us about your project"
-          value={form.details}
-          onChange={(e) =>
-            setForm({ ...form, details: e.target.value })
-          }
-        />
-
-        <button onClick={submitOrder}>
-          Submit Order
-        </button>
-
-        <div className="payment">
-          <h2>Payment</h2>
-
-          <p>
-            UPI ID: <b>7846944419@ybl</b>
-          </p>
-
-          <p>Scan QR Code to Pay</p>
-
-          <div className="qr">
-            QR CODE WILL BE ADDED SOON
-          </div>
+        <div className="footer-bottom">
+          <span>Made with ❤️ by Ganga Naik</span>
+          <span>Mayurbhanj, Odisha, India</span>
+          <span>© {new Date().getFullYear()} SN WEB TECHNOLOGIES</span>
         </div>
-      </section>
-
-      <footer>
-        Made with ❤️ by Ganga Naik
-        <br />
-        Mayurbhanj, Odisha, India
       </footer>
     </div>
   );
@@ -213,61 +449,25 @@ function Home() {
 
 function Welcome() {
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      background: "#f3f4f6",
-      fontFamily: "Arial",
-      padding: "20px"
-    }}>
-      <div style={{
-        background: "white",
-        padding: "35px",
-        borderRadius: "15px",
-        width: "100%",
-        maxWidth: "400px",
-        textAlign: "center",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.1)"
-      }}>
+    <div className="welcome-page">
+      <div className="welcome-card">
+        <div className="welcome-logo">SN</div>
         <h2>SN WEB TECHNOLOGIES</h2>
+        <span className="eyebrow">WELCOME TO OUR DIGITAL WORLD</span>
 
         <h3>Welcome!</h3>
+        <p>Sign in or create an account to continue.</p>
 
-        <p>Welcome to our website.</p>
-
-        <p>Already have an account?</p>
-
-        <Link to="/customer-login" style={{
-          display: "block",
-          padding: "13px",
-          background: "#111827",
-          color: "white",
-          textDecoration: "none",
-          borderRadius: "7px",
-          marginBottom: "20px"
-        }}>
+        <Link to="/customer-login" className="welcome-login">
           Customer Login
         </Link>
 
-        <p>New to SN WEB TECHNOLOGIES?</p>
-
-        <Link to="/customer-signup" style={{
-          display: "block",
-          padding: "13px",
-          background: "#2563eb",
-          color: "white",
-          textDecoration: "none",
-          borderRadius: "7px"
-        }}>
+        <Link to="/customer-signup" className="welcome-signup">
           Create New Account
         </Link>
 
-        <p style={{ marginTop: "25px" }}>
-          <Link to="/admin-login">
-            Admin Login
-          </Link>
+        <p className="admin-link">
+          <Link to="/admin-login">Admin Login</Link>
         </p>
       </div>
     </div>
@@ -288,7 +488,7 @@ function HomeGate() {
   }, []);
 
   if (checking) {
-    return <p style={{ textAlign: "center" }}>Loading...</p>;
+    return <div className="loading-screen">Loading...</div>;
   }
 
   return user ? <Home /> : <Welcome />;
@@ -299,45 +499,15 @@ function App() {
     <Routes>
       <Route path="/" element={<HomeGate />} />
 
-      <Route
-        path="/customer-signup"
-        element={<CustomerSignup />}
-      />
+      <Route path="/customer-signup" element={<CustomerSignup />} />
+      <Route path="/customer-login" element={<CustomerLogin />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/customer-profile" element={<CustomerProfile />} />
+      <Route path="/my-orders" element={<MyOrders />} />
+      <Route path="/order-history" element={<OrderHistory />} />
+      <Route path="/customer-dashboard" element={<CustomerDashboard />} />
 
-      <Route
-        path="/customer-login"
-        element={<CustomerLogin />}
-      />
-
-      <Route
-        path="/forgot-password"
-        element={<ForgotPassword />}
-      />
-
-      <Route
-        path="/customer-profile"
-        element={<CustomerProfile />}
-      />
-
-      <Route
-        path="/my-orders"
-        element={<MyOrders />}
-      />
-
-      <Route
-        path="/order-history"
-        element={<OrderHistory />}
-      />
-
-      <Route
-        path="/customer-dashboard"
-        element={<CustomerDashboard />}
-      />
-
-      <Route
-        path="/admin-login"
-        element={<AdminLogin />}
-      />
+      <Route path="/admin-login" element={<AdminLogin />} />
 
       <Route
         path="/admin"
