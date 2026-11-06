@@ -23,9 +23,7 @@ function Admin() {
       setLoading(true);
       setError("");
 
-      const querySnapshot = await getDocs(
-        collection(db, "orders")
-      );
+      const querySnapshot = await getDocs(collection(db, "orders"));
 
       const data = querySnapshot.docs.map((item) => ({
         id: item.id,
@@ -47,9 +45,7 @@ function Admin() {
 
   const updateOrderStatus = async (id, status) => {
     try {
-      await updateDoc(doc(db, "orders", id), {
-        status: status,
-      });
+      await updateDoc(doc(db, "orders", id), { status });
 
       setOrders((previousOrders) =>
         previousOrders.map((order) =>
@@ -105,6 +101,18 @@ function Admin() {
     }
   };
 
+  const pendingCount = orders.filter(
+    (order) => (order.status || "Pending") === "Pending"
+  ).length;
+
+  const progressCount = orders.filter(
+    (order) => order.status === "In Progress"
+  ).length;
+
+  const completedCount = orders.filter(
+    (order) => order.status === "Completed"
+  ).length;
+
   const filteredOrders = orders.filter((order) => {
     const searchText = search.toLowerCase();
 
@@ -135,9 +143,7 @@ function Admin() {
       <div style={styles.container}>
         <header style={styles.header}>
           <div>
-            <h1 style={styles.company}>
-              SN WEB TECHNOLOGIES
-            </h1>
+            <h1 style={styles.company}>SN WEB TECHNOLOGIES</h1>
             <h2 style={styles.heading}>Admin Dashboard</h2>
           </div>
 
@@ -147,117 +153,143 @@ function Admin() {
         </header>
 
         <section style={styles.summary}>
-          <h3>Customer Orders</h3>
-          <p style={styles.total}>
-            Total Orders: {orders.length}
-          </p>
+          <h3>Order Overview</h3>
+
+          <div style={styles.cards}>
+            <div style={styles.card}>
+              <p style={styles.cardLabel}>Total Orders</p>
+              <h2 style={styles.cardNumber}>{orders.length}</h2>
+            </div>
+
+            <div style={styles.card}>
+              <p style={styles.cardLabel}>Pending Orders</p>
+              <h2 style={{ ...styles.cardNumber, color: "#d97706" }}>
+                {pendingCount}
+              </h2>
+            </div>
+
+            <div style={styles.card}>
+              <p style={styles.cardLabel}>In Progress</p>
+              <h2 style={{ ...styles.cardNumber, color: "#2563eb" }}>
+                {progressCount}
+              </h2>
+            </div>
+
+            <div style={styles.card}>
+              <p style={styles.cardLabel}>Completed Orders</p>
+              <h2 style={{ ...styles.cardNumber, color: "#16a34a" }}>
+                {completedCount}
+              </h2>
+            </div>
+          </div>
         </section>
 
-        <div style={styles.controls}>
-          <input
-            type="text"
-            placeholder="Search name, mobile, email or service"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={styles.input}
-          />
+        <section style={styles.ordersSection}>
+          <h3>Customer Orders</h3>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={styles.select}
-          >
-            <option value="All">All Orders</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
+          <div style={styles.controls}>
+            <input
+              type="text"
+              placeholder="Search name, mobile, email or service"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={styles.input}
+            />
 
-          <button onClick={loadOrders} style={styles.refresh}>
-            Refresh Orders
-          </button>
-        </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              style={styles.select}
+            >
+              <option value="All">All Orders</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
 
-        {loading ? (
-          <p>Loading orders...</p>
-        ) : error ? (
-          <div>
-            <p style={{ color: "red" }}>{error}</p>
-            <button onClick={loadOrders}>Try Again</button>
+            <button onClick={loadOrders} style={styles.refresh}>
+              Refresh Orders
+            </button>
           </div>
-        ) : (
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>Name</th>
-                  <th style={styles.th}>Mobile</th>
-                  <th style={styles.th}>Email</th>
-                  <th style={styles.th}>Service</th>
-                  <th style={styles.th}>Project Details</th>
-                  <th style={styles.th}>Status</th>
-                  <th style={styles.th}>Action</th>
-                </tr>
-              </thead>
 
-              <tbody>
-                {filteredOrders.length === 0 ? (
+          {loading ? (
+            <p>Loading orders...</p>
+          ) : error ? (
+            <div>
+              <p style={{ color: "red" }}>{error}</p>
+              <button onClick={loadOrders}>Try Again</button>
+            </div>
+          ) : (
+            <div style={styles.tableWrapper}>
+              <table style={styles.table}>
+                <thead>
                   <tr>
-                    <td colSpan="7" style={styles.empty}>
-                      No matching orders found.
-                    </td>
+                    <th style={styles.th}>Name</th>
+                    <th style={styles.th}>Mobile</th>
+                    <th style={styles.th}>Email</th>
+                    <th style={styles.th}>Service</th>
+                    <th style={styles.th}>Project Details</th>
+                    <th style={styles.th}>Status</th>
+                    <th style={styles.th}>Action</th>
                   </tr>
-                ) : (
-                  filteredOrders.map((order) => (
-                    <tr key={order.id}>
-                      <td style={styles.td}>{order.name}</td>
-                      <td style={styles.td}>{order.mobile}</td>
-                      <td style={styles.td}>{order.email}</td>
-                      <td style={styles.td}>{order.service}</td>
-                      <td style={styles.td}>
-                        {order.details || "No details provided"}
-                      </td>
+                </thead>
 
-                      <td style={styles.td}>
-                        <select
-                          value={order.status || "Pending"}
-                          onChange={(e) =>
-                            updateOrderStatus(
-                              order.id,
-                              e.target.value
-                            )
-                          }
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="In Progress">In Progress</option>
-                          <option value="Completed">Completed</option>
-                        </select>
-                      </td>
-
-                      <td style={styles.td}>
-                        <div style={styles.actions}>
-                          <button
-                            onClick={() => setSelectedOrder(order)}
-                            style={styles.viewButton}
-                          >
-                            View Details
-                          </button>
-
-                          <button
-                            onClick={() => deleteOrder(order.id)}
-                            style={styles.deleteButton}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                <tbody>
+                  {filteredOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" style={styles.empty}>
+                        No matching orders found.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                  ) : (
+                    filteredOrders.map((order) => (
+                      <tr key={order.id}>
+                        <td style={styles.td}>{order.name}</td>
+                        <td style={styles.td}>{order.mobile}</td>
+                        <td style={styles.td}>{order.email}</td>
+                        <td style={styles.td}>{order.service}</td>
+                        <td style={styles.td}>
+                          {order.details || "No details provided"}
+                        </td>
+
+                        <td style={styles.td}>
+                          <select
+                            value={order.status || "Pending"}
+                            onChange={(e) =>
+                              updateOrderStatus(order.id, e.target.value)
+                            }
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </td>
+
+                        <td style={styles.td}>
+                          <div style={styles.actions}>
+                            <button
+                              onClick={() => setSelectedOrder(order)}
+                              style={styles.viewButton}
+                            >
+                              View Details
+                            </button>
+
+                            <button
+                              onClick={() => deleteOrder(order.id)}
+                              style={styles.deleteButton}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </div>
 
       {selectedOrder && (
@@ -337,13 +369,36 @@ const styles = {
   },
   summary: {
     background: "white",
-    padding: "18px",
+    padding: "20px",
     borderRadius: "10px",
     marginBottom: "20px",
   },
-  total: {
-    color: "#2563eb",
-    fontWeight: "bold",
+  cards: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "15px",
+    marginTop: "15px",
+  },
+  card: {
+    background: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    borderRadius: "10px",
+    padding: "15px",
+  },
+  cardLabel: {
+    color: "#64748b",
+    fontSize: "14px",
+    margin: "0 0 10px",
+  },
+  cardNumber: {
+    color: "#111827",
+    fontSize: "28px",
+    margin: 0,
+  },
+  ordersSection: {
+    background: "white",
+    padding: "20px",
+    borderRadius: "10px",
   },
   controls: {
     display: "flex",
@@ -374,7 +429,6 @@ const styles = {
   },
   tableWrapper: {
     overflowX: "auto",
-    background: "white",
     borderRadius: "10px",
   },
   table: {
