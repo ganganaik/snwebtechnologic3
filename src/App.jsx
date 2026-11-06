@@ -3,7 +3,11 @@ import { Routes, Route, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { db, auth } from "./firebase";
-import { collection, addDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "firebase/firestore";
 
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/Adminlogin";
@@ -50,7 +54,10 @@ function Home() {
         return;
       }
 
-      await addDoc(collection(db, "orders"), form);
+      await addDoc(collection(db, "orders"), {
+        ...form,
+        createdAt: serverTimestamp()
+      });
 
       alert("Order Submitted Successfully!");
 
