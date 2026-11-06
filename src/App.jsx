@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import CustomerProfile from "./pages/CustomerProfile";
 import MyOrders from "./pages/MyOrders";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import OrderHistory from "./pages/OrderHistory";
 
 function Home() {
   const [form, setForm] = useState({
@@ -314,6 +315,11 @@ function App() {
       <Route
         path="/my-orders"
         element={<MyOrders />}
+      />
+
+      <Route
+        path="/order-history"
+        element={<OrderHistory />}
       />
 
       <Route
