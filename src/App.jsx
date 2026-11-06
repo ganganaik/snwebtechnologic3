@@ -1,7 +1,7 @@
 
 import { Routes, Route, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { db, auth } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
 
@@ -22,6 +22,20 @@ function Home() {
     service: "",
     details: ""
   });
+
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await signOut(auth);
+      window.location.href = "/";
+    } catch (error) {
+      setLoggingOut(false);
+      alert("Logout failed. Please try again.");
+      console.error(error);
+    }
+  };
 
   const submitOrder = async () => {
     try {
@@ -52,8 +66,16 @@ function Home() {
           <a href="#">Services</a>
           <a href="#">About</a>
           <a href="#">Contact</a>
+
           <Link to="/customer-profile">My Profile</Link>
           <Link to="/my-orders">My Orders</Link>
+
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+          >
+            {loggingOut ? "Logging out..." : "Logout"}
+          </button>
         </div>
       </nav>
 
