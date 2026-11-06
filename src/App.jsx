@@ -13,6 +13,7 @@ import CustomerLogin from "./pages/CustomerLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import CustomerProfile from "./pages/CustomerProfile";
 import MyOrders from "./pages/MyOrders";
+import CustomerDashboard from "./pages/CustomerDashboard";
 
 function Home() {
   const [form, setForm] = useState({
@@ -76,6 +77,7 @@ function Home() {
           <a href="#">About</a>
           <a href="#">Contact</a>
 
+          <Link to="/customer-dashboard">Dashboard</Link>
           <Link to="/customer-profile">My Profile</Link>
           <Link to="/my-orders">My Orders</Link>
 
@@ -312,6 +314,11 @@ function App() {
       <Route
         path="/my-orders"
         element={<MyOrders />}
+      />
+
+      <Route
+        path="/customer-dashboard"
+        element={<CustomerDashboard />}
       />
 
       <Route
