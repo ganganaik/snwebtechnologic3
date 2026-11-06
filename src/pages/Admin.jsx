@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import {
@@ -178,7 +177,8 @@ function Admin() {
       (order.name || "").toLowerCase().includes(term) ||
       (order.email || "").toLowerCase().includes(term) ||
       (order.mobile || "").includes(term) ||
-      (order.service || "").toLowerCase().includes(term);
+      (order.service || "").toLowerCase().includes(term) ||
+      (order.details || "").toLowerCase().includes(term);
 
     const matchesStatus =
       statusFilter === "All" ||
@@ -308,19 +308,88 @@ function Admin() {
 
   return (
     <div style={styles.page}>
+      <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .admin-table-wrapper {
+          width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .admin-orders-table {
+          width: 100%;
+          min-width: 1100px;
+          border-collapse: collapse;
+        }
+
+        .admin-orders-table th,
+        .admin-orders-table td {
+          overflow-wrap: anywhere;
+        }
+
+        .admin-orders-table tbody tr:hover {
+          background: #1d1a13;
+        }
+
+        @media (max-width: 600px) {
+          .admin-page {
+            padding: 12px !important;
+          }
+
+          .admin-section {
+            padding: 15px !important;
+          }
+
+          .admin-company {
+            font-size: 18px !important;
+          }
+
+          .admin-heading {
+            font-size: 21px !important;
+          }
+
+          .admin-section-title {
+            font-size: 19px !important;
+          }
+
+          .admin-pagination {
+            flex-direction: column;
+            align-items: flex-start !important;
+          }
+
+          .admin-pagination-actions {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .admin-modal {
+            padding: 17px !important;
+          }
+        }
+      `}</style>
+
       <div style={styles.container}>
         <header style={styles.header}>
           <div>
-            <h1 style={styles.company}>SN WEB TECHNOLOGIES</h1>
-            <h2 style={styles.heading}>Admin Dashboard</h2>
+            <h1 style={styles.company} className="admin-company">
+              SN WEB TECHNOLOGIES
+            </h1>
+            <h2 style={styles.heading} className="admin-heading">
+              Admin Dashboard
+            </h2>
           </div>
           <button onClick={handleLogout} style={styles.logout}>
             Logout
           </button>
         </header>
 
-        <section style={styles.summary}>
-          <h3 style={styles.sectionTitle}>Order Overview</h3>
+        <section style={styles.summary} className="admin-section">
+          <h3 style={styles.sectionTitle} className="admin-section-title">
+            Order Overview
+          </h3>
           <div style={styles.cards}>
             <div style={styles.card}>
               <p style={styles.cardLabel}>Total Orders</p>
@@ -347,13 +416,15 @@ function Admin() {
           </div>
         </section>
 
-        <section style={styles.ordersSection}>
-          <h3 style={styles.sectionTitle}>Customer Orders</h3>
+        <section style={styles.ordersSection} className="admin-section">
+          <h3 style={styles.sectionTitle} className="admin-section-title">
+            Customer Orders
+          </h3>
 
           <div style={styles.controls}>
             <input
               type="text"
-              placeholder="Search name, mobile, email or service"
+              placeholder="Search name, mobile, email, service or details"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -467,8 +538,8 @@ function Admin() {
               </button>
             </div>
           ) : (
-            <div style={styles.tableWrapper}>
-              <table style={styles.table}>
+            <div style={styles.tableWrapper} className="admin-table-wrapper">
+              <table style={styles.table} className="admin-orders-table">
                 <thead>
                   <tr>
                     <th style={styles.th}>
@@ -507,14 +578,26 @@ function Admin() {
                             aria-label={`Select order from ${order.name || "customer"}`}
                           />
                         </td>
-                        <td style={styles.td}>{order.name || "Not provided"}</td>
-                        <td style={styles.td}>{order.mobile || "Not provided"}</td>
-                        <td style={styles.td}>{order.email || "Not provided"}</td>
-                        <td style={styles.td}>{order.service || "Not provided"}</td>
+                        <td style={styles.td}>
+                          <strong style={styles.customerName}>
+                            {order.name || "Not provided"}
+                          </strong>
+                        </td>
+                        <td style={styles.td}>
+                          {order.mobile || "Not provided"}
+                        </td>
+                        <td style={styles.td}>
+                          {order.email || "Not provided"}
+                        </td>
+                        <td style={styles.td}>
+                          {order.service || "Not provided"}
+                        </td>
                         <td style={styles.td}>
                           {order.details || "No details provided"}
                         </td>
-                        <td style={styles.td}>{formatOrderDate(order)}</td>
+                        <td style={styles.td}>
+                          {formatOrderDate(order)}
+                        </td>
                         <td style={styles.td}>
                           <select
                             value={order.status || "Pending"}
@@ -556,11 +639,14 @@ function Admin() {
           )}
 
           {!loading && !error && (
-            <div style={styles.pagination}>
+            <div style={styles.pagination} className="admin-pagination">
               <span style={styles.paginationInfo}>
                 Showing {showingFrom}–{showingTo} of {sortedOrders.length} orders
               </span>
-              <div style={styles.paginationActions}>
+              <div
+                style={styles.paginationActions}
+                className="admin-pagination-actions"
+              >
                 <button
                   onClick={() => setCurrentPage(safeCurrentPage - 1)}
                   disabled={safeCurrentPage === 1}
@@ -599,6 +685,7 @@ function Admin() {
         >
           <div
             style={styles.modal}
+            className="admin-modal"
             onClick={(e) => e.stopPropagation()}
           >
             <div style={styles.modalHeader}>
@@ -816,6 +903,11 @@ const styles = {
     verticalAlign: "top",
     lineHeight: 1.6,
     overflowWrap: "anywhere",
+  },
+  customerName: {
+    color: "#f5d778",
+    fontSize: "15px",
+    fontWeight: "bold",
   },
   empty: {
     padding: "25px",
