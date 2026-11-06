@@ -16,6 +16,7 @@ function Admin() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const loadOrders = async () => {
@@ -129,6 +130,54 @@ function Admin() {
     return matchesSearch && matchesStatus;
   });
 
+  const getOrderTime = (order) => {
+    const createdAt = order.createdAt;
+
+    if (!createdAt) return null;
+
+    if (typeof createdAt.toMillis === "function") {
+      return createdAt.toMillis();
+    }
+
+    if (typeof createdAt.seconds === "number") {
+      return createdAt.seconds * 1000;
+    }
+
+    return null;
+  };
+
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (sortOrder === "nameAsc") {
+      return (a.name || "").localeCompare(b.name || "");
+    }
+
+    if (sortOrder === "nameDesc") {
+      return (b.name || "").localeCompare(a.name || "");
+    }
+
+    const timeA = getOrderTime(a);
+    const timeB = getOrderTime(b);
+
+    // Orders without a saved date stay at the bottom.
+    if (timeA === null && timeB === null) return 0;
+    if (timeA === null) return 1;
+    if (timeB === null) return -1;
+
+    if (sortOrder === "oldest") {
+      return timeA - timeB;
+    }
+
+    return timeB - timeA;
+  });
+
+  const formatOrderDate = (order) => {
+    const timestamp = getOrderTime(order);
+
+    if (timestamp === null) return "Date not available";
+
+    return new Date(timestamp).toLocaleString();
+  };
+
   const detailRow = (label, value) => (
     <div style={styles.detailRow}>
       <strong style={styles.detailLabel}>{label}</strong>
@@ -207,6 +256,17 @@ function Admin() {
               <option value="Completed">Completed</option>
             </select>
 
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              style={styles.select}
+            >
+              <option value="newest">Latest Orders First</option>
+              <option value="oldest">Oldest Orders First</option>
+              <option value="nameAsc">Customer Name (A–Z)</option>
+              <option value="nameDesc">Customer Name (Z–A)</option>
+            </select>
+
             <button onClick={loadOrders} style={styles.refresh}>
               Refresh Orders
             </button>
@@ -229,20 +289,21 @@ function Admin() {
                     <th style={styles.th}>Email</th>
                     <th style={styles.th}>Service</th>
                     <th style={styles.th}>Project Details</th>
+                    <th style={styles.th}>Order Date</th>
                     <th style={styles.th}>Status</th>
                     <th style={styles.th}>Action</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {filteredOrders.length === 0 ? (
+                  {sortedOrders.length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={styles.empty}>
+                      <td colSpan="8" style={styles.empty}>
                         No matching orders found.
                       </td>
                     </tr>
                   ) : (
-                    filteredOrders.map((order) => (
+                    sortedOrders.map((order) => (
                       <tr key={order.id}>
                         <td style={styles.td}>{order.name}</td>
                         <td style={styles.td}>{order.mobile}</td>
@@ -251,7 +312,9 @@ function Admin() {
                         <td style={styles.td}>
                           {order.details || "No details provided"}
                         </td>
-
+                        <td style={styles.td}>
+                          {formatOrderDate(order)}
+                        </td>
                         <td style={styles.td}>
                           <select
                             value={order.status || "Pending"}
@@ -264,7 +327,6 @@ function Admin() {
                             <option value="Completed">Completed</option>
                           </select>
                         </td>
-
                         <td style={styles.td}>
                           <div style={styles.actions}>
                             <button
@@ -317,6 +379,7 @@ function Admin() {
             {detailRow("Email Address", selectedOrder.email)}
             {detailRow("Service", selectedOrder.service)}
             {detailRow("Project Details", selectedOrder.details)}
+            {detailRow("Order Date", formatOrderDate(selectedOrder))}
             {detailRow("Order Status", selectedOrder.status || "Pending")}
             {detailRow("Order ID", selectedOrder.id)}
 
@@ -340,10 +403,7 @@ const styles = {
     padding: "20px",
     fontFamily: "Arial, sans-serif",
   },
-  container: {
-    maxWidth: "1200px",
-    margin: "auto",
-  },
+  container: { maxWidth: "1200px", margin: "auto" },
   header: {
     display: "flex",
     justifyContent: "space-between",
@@ -352,13 +412,8 @@ const styles = {
     flexWrap: "wrap",
     marginBottom: "25px",
   },
-  company: {
-    color: "#1d4ed8",
-    fontSize: "24px",
-  },
-  heading: {
-    color: "#111827",
-  },
+  company: { color: "#1d4ed8", fontSize: "24px" },
+  heading: { color: "#111827" },
   logout: {
     background: "#dc2626",
     color: "white",
@@ -418,6 +473,7 @@ const styles = {
     padding: "12px",
     borderRadius: "7px",
     border: "1px solid #cbd5e1",
+    maxWidth: "100%",
   },
   refresh: {
     background: "#2563eb",
@@ -427,14 +483,11 @@ const styles = {
     padding: "12px 18px",
     cursor: "pointer",
   },
-  tableWrapper: {
-    overflowX: "auto",
-    borderRadius: "10px",
-  },
+  tableWrapper: { overflowX: "auto", borderRadius: "10px" },
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "1050px",
+    minWidth: "1200px",
   },
   th: {
     background: "#1e40af",
@@ -446,14 +499,8 @@ const styles = {
     padding: "12px",
     borderBottom: "1px solid #e2e8f0",
   },
-  empty: {
-    padding: "25px",
-    textAlign: "center",
-  },
-  actions: {
-    display: "flex",
-    gap: "7px",
-  },
+  empty: { padding: "25px", textAlign: "center" },
+  actions: { display: "flex", gap: "7px" },
   viewButton: {
     background: "#2563eb",
     color: "white",
@@ -497,10 +544,7 @@ const styles = {
     alignItems: "center",
     marginBottom: "15px",
   },
-  modalTitle: {
-    color: "#1e40af",
-    margin: 0,
-  },
+  modalTitle: { color: "#1e40af", margin: 0 },
   closeButton: {
     background: "#fee2e2",
     color: "#dc2626",
@@ -518,10 +562,7 @@ const styles = {
     padding: "12px 0",
     borderBottom: "1px solid #e2e8f0",
   },
-  detailLabel: {
-    color: "#64748b",
-    fontSize: "13px",
-  },
+  detailLabel: { color: "#64748b", fontSize: "13px" },
   detailValue: {
     color: "#111827",
     fontSize: "15px",
