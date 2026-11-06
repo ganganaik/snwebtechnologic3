@@ -16,6 +16,7 @@ function Admin() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const loadOrders = async () => {
     try {
@@ -56,6 +57,12 @@ function Admin() {
         )
       );
 
+      setSelectedOrder((previousOrder) =>
+        previousOrder?.id === id
+          ? { ...previousOrder, status }
+          : previousOrder
+      );
+
       alert("Order status updated successfully!");
     } catch (err) {
       console.error(err);
@@ -75,6 +82,10 @@ function Admin() {
 
       setOrders((previousOrders) =>
         previousOrders.filter((order) => order.id !== id)
+      );
+
+      setSelectedOrder((previousOrder) =>
+        previousOrder?.id === id ? null : previousOrder
       );
 
       alert("Order deleted successfully!");
@@ -110,139 +121,369 @@ function Admin() {
     return matchesSearch && matchesStatus;
   });
 
+  const detailRow = (label, value) => (
+    <div style={styles.detailRow}>
+      <strong style={styles.detailLabel}>{label}</strong>
+      <span style={styles.detailValue}>
+        {value || "Not provided"}
+      </span>
+    </div>
+  );
+
   return (
-    <div style={{
-      padding: "20px",
-      fontFamily: "Arial",
-      maxWidth: "1200px",
-      margin: "auto"
-    }}>
-      <h1>SN WEB TECHNOLOGIES</h1>
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <header style={styles.header}>
+          <div>
+            <h1 style={styles.company}>
+              SN WEB TECHNOLOGIES
+            </h1>
+            <h2 style={styles.heading}>Admin Dashboard</h2>
+          </div>
 
-      <h2>Admin Dashboard</h2>
+          <button onClick={handleLogout} style={styles.logout}>
+            Logout
+          </button>
+        </header>
 
-      <button onClick={handleLogout}>
-        Logout
-      </button>
+        <section style={styles.summary}>
+          <h3>Customer Orders</h3>
+          <p style={styles.total}>
+            Total Orders: {orders.length}
+          </p>
+        </section>
 
-      <hr />
+        <div style={styles.controls}>
+          <input
+            type="text"
+            placeholder="Search name, mobile, email or service"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={styles.input}
+          />
 
-      <h3>Customer Orders</h3>
-
-      <h4>Total Orders: {orders.length}</h4>
-
-      <div style={{
-        display: "flex",
-        gap: "10px",
-        flexWrap: "wrap",
-        marginBottom: "20px"
-      }}>
-        <input
-          type="text"
-          placeholder="Search name, mobile, email or service"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            padding: "12px",
-            flex: "1",
-            minWidth: "220px"
-          }}
-        />
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ padding: "12px" }}
-        >
-          <option value="All">All Orders</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-
-        <button onClick={loadOrders}>
-          Refresh Orders
-        </button>
-      </div>
-
-      {loading ? (
-        <p>Loading orders...</p>
-      ) : error ? (
-        <div>
-          <p style={{ color: "red" }}>{error}</p>
-          <button onClick={loadOrders}>Try Again</button>
-        </div>
-      ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table
-            border="1"
-            cellPadding="10"
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              minWidth: "850px"
-            }}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={styles.select}
           >
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Mobile</th>
-                <th>Email</th>
-                <th>Service</th>
-                <th>Project Details</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+            <option value="All">All Orders</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
 
-            <tbody>
-              {filteredOrders.length === 0 ? (
+          <button onClick={loadOrders} style={styles.refresh}>
+            Refresh Orders
+          </button>
+        </div>
+
+        {loading ? (
+          <p>Loading orders...</p>
+        ) : error ? (
+          <div>
+            <p style={{ color: "red" }}>{error}</p>
+            <button onClick={loadOrders}>Try Again</button>
+          </div>
+        ) : (
+          <div style={styles.tableWrapper}>
+            <table style={styles.table}>
+              <thead>
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
-                    No matching orders found.
-                  </td>
+                  <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Mobile</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Service</th>
+                  <th style={styles.th}>Project Details</th>
+                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Action</th>
                 </tr>
-              ) : (
-                filteredOrders.map((order) => (
-                  <tr key={order.id}>
-                    <td>{order.name}</td>
-                    <td>{order.mobile}</td>
-                    <td>{order.email}</td>
-                    <td>{order.service}</td>
-                    <td>{order.details || "No details provided"}</td>
+              </thead>
 
-                    <td>
-                      <select
-                        value={order.status || "Pending"}
-                        onChange={(e) =>
-                          updateOrderStatus(
-                            order.id,
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                      </select>
-                    </td>
-
-                    <td>
-                      <button
-                        onClick={() => deleteOrder(order.id)}
-                      >
-                        Delete
-                      </button>
+              <tbody>
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" style={styles.empty}>
+                      No matching orders found.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredOrders.map((order) => (
+                    <tr key={order.id}>
+                      <td style={styles.td}>{order.name}</td>
+                      <td style={styles.td}>{order.mobile}</td>
+                      <td style={styles.td}>{order.email}</td>
+                      <td style={styles.td}>{order.service}</td>
+                      <td style={styles.td}>
+                        {order.details || "No details provided"}
+                      </td>
+
+                      <td style={styles.td}>
+                        <select
+                          value={order.status || "Pending"}
+                          onChange={(e) =>
+                            updateOrderStatus(
+                              order.id,
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      </td>
+
+                      <td style={styles.td}>
+                        <div style={styles.actions}>
+                          <button
+                            onClick={() => setSelectedOrder(order)}
+                            style={styles.viewButton}
+                          >
+                            View Details
+                          </button>
+
+                          <button
+                            onClick={() => deleteOrder(order.id)}
+                            style={styles.deleteButton}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {selectedOrder && (
+        <div
+          style={styles.overlay}
+          onClick={() => setSelectedOrder(null)}
+        >
+          <div
+            style={styles.modal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Order Details</h2>
+
+              <button
+                onClick={() => setSelectedOrder(null)}
+                style={styles.closeButton}
+              >
+                ×
+              </button>
+            </div>
+
+            {detailRow("Customer Name", selectedOrder.name)}
+            {detailRow("Mobile Number", selectedOrder.mobile)}
+            {detailRow("Email Address", selectedOrder.email)}
+            {detailRow("Service", selectedOrder.service)}
+            {detailRow("Project Details", selectedOrder.details)}
+            {detailRow("Order Status", selectedOrder.status || "Pending")}
+            {detailRow("Order ID", selectedOrder.id)}
+
+            <button
+              onClick={() => setSelectedOrder(null)}
+              style={styles.closeBottom}
+            >
+              Close Details
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background: "#f1f5f9",
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
+  },
+  container: {
+    maxWidth: "1200px",
+    margin: "auto",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "15px",
+    flexWrap: "wrap",
+    marginBottom: "25px",
+  },
+  company: {
+    color: "#1d4ed8",
+    fontSize: "24px",
+  },
+  heading: {
+    color: "#111827",
+  },
+  logout: {
+    background: "#dc2626",
+    color: "white",
+    border: "none",
+    borderRadius: "7px",
+    padding: "11px 20px",
+    cursor: "pointer",
+  },
+  summary: {
+    background: "white",
+    padding: "18px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+  },
+  total: {
+    color: "#2563eb",
+    fontWeight: "bold",
+  },
+  controls: {
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginBottom: "20px",
+  },
+  input: {
+    flex: "1",
+    minWidth: "220px",
+    padding: "12px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "7px",
+    boxSizing: "border-box",
+  },
+  select: {
+    padding: "12px",
+    borderRadius: "7px",
+    border: "1px solid #cbd5e1",
+  },
+  refresh: {
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: "7px",
+    padding: "12px 18px",
+    cursor: "pointer",
+  },
+  tableWrapper: {
+    overflowX: "auto",
+    background: "white",
+    borderRadius: "10px",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    minWidth: "1050px",
+  },
+  th: {
+    background: "#1e40af",
+    color: "white",
+    padding: "13px",
+    textAlign: "left",
+  },
+  td: {
+    padding: "12px",
+    borderBottom: "1px solid #e2e8f0",
+  },
+  empty: {
+    padding: "25px",
+    textAlign: "center",
+  },
+  actions: {
+    display: "flex",
+    gap: "7px",
+  },
+  viewButton: {
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    padding: "9px 12px",
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+  },
+  deleteButton: {
+    background: "#dc2626",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    padding: "9px 12px",
+    cursor: "pointer",
+  },
+  overlay: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15, 23, 42, 0.65)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "15px",
+    zIndex: 1000,
+  },
+  modal: {
+    background: "white",
+    width: "100%",
+    maxWidth: "500px",
+    maxHeight: "90vh",
+    overflowY: "auto",
+    padding: "25px",
+    borderRadius: "14px",
+    boxSizing: "border-box",
+  },
+  modalHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "15px",
+  },
+  modalTitle: {
+    color: "#1e40af",
+    margin: 0,
+  },
+  closeButton: {
+    background: "#fee2e2",
+    color: "#dc2626",
+    border: "none",
+    borderRadius: "50%",
+    width: "35px",
+    height: "35px",
+    fontSize: "24px",
+    cursor: "pointer",
+  },
+  detailRow: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+    padding: "12px 0",
+    borderBottom: "1px solid #e2e8f0",
+  },
+  detailLabel: {
+    color: "#64748b",
+    fontSize: "13px",
+  },
+  detailValue: {
+    color: "#111827",
+    fontSize: "15px",
+    overflowWrap: "anywhere",
+    whiteSpace: "pre-wrap",
+  },
+  closeBottom: {
+    width: "100%",
+    marginTop: "20px",
+    padding: "12px",
+    background: "#1e40af",
+    color: "white",
+    border: "none",
+    borderRadius: "7px",
+    cursor: "pointer",
+  },
+};
 
 export default Admin;
