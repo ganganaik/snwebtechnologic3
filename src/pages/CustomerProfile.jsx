@@ -1,4 +1,6 @@
+
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -37,7 +39,8 @@ function CustomerProfile() {
           setError("Customer profile not found.");
         }
       } catch (err) {
-        setError("Unable to load profile.");
+        console.error("Profile Loading Error:", err);
+        setError("Unable to load profile. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -64,16 +67,167 @@ function CustomerProfile() {
 
       setMessage("Profile updated successfully!");
     } catch (err) {
+      console.error("Profile Update Error:", err);
       setError("Unable to update profile. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
+  const styles = {
+    page: {
+      minHeight: "100vh",
+      background: "#080808",
+      color: "#f8f5ed",
+      padding: "30px 15px",
+      fontFamily: "Arial, sans-serif",
+      boxSizing: "border-box"
+    },
+    container: {
+      maxWidth: "550px",
+      margin: "0 auto"
+    },
+    loading: {
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "#080808",
+      color: "#d4af37",
+      fontFamily: "Arial, sans-serif",
+      fontSize: "17px"
+    },
+    backLink: {
+      display: "inline-block",
+      marginBottom: "22px",
+      color: "#d4af37",
+      textDecoration: "none",
+      fontWeight: "bold",
+      fontSize: "14px"
+    },
+    card: {
+      background: "#141414",
+      border: "1px solid #292929",
+      padding: "30px",
+      borderRadius: "15px",
+      boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
+      boxSizing: "border-box"
+    },
+    header: {
+      textAlign: "center",
+      marginBottom: "30px"
+    },
+    avatar: {
+      width: "78px",
+      height: "78px",
+      borderRadius: "50%",
+      background: "#d4af37",
+      color: "#080808",
+      fontSize: "32px",
+      fontWeight: "bold",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      margin: "0 auto 16px",
+      border: "3px solid #806820"
+    },
+    company: {
+      color: "#d4af37",
+      fontSize: "21px",
+      margin: "10px 0",
+      letterSpacing: "0.5px"
+    },
+    heading: {
+      color: "#f8f5ed",
+      fontSize: "25px",
+      margin: "12px 0"
+    },
+    subtitle: {
+      color: "#aaa",
+      fontSize: "14px",
+      lineHeight: "1.6"
+    },
+    label: {
+      display: "block",
+      color: "#e4c45c",
+      fontWeight: "bold",
+      fontSize: "14px",
+      marginBottom: "9px"
+    },
+    input: {
+      width: "100%",
+      padding: "13px",
+      marginBottom: "21px",
+      background: "#1d1d1d",
+      color: "#f8f5ed",
+      border: "1px solid #444",
+      borderRadius: "8px",
+      fontSize: "15px",
+      boxSizing: "border-box",
+      outlineColor: "#d4af37"
+    },
+    disabledInput: {
+      background: "#252525",
+      color: "#999",
+      cursor: "not-allowed"
+    },
+    textarea: {
+      width: "100%",
+      padding: "13px",
+      marginBottom: "20px",
+      background: "#1d1d1d",
+      color: "#f8f5ed",
+      border: "1px solid #444",
+      borderRadius: "8px",
+      fontSize: "15px",
+      boxSizing: "border-box",
+      resize: "vertical",
+      fontFamily: "Arial, sans-serif",
+      outlineColor: "#d4af37"
+    },
+    button: {
+      width: "100%",
+      padding: "14px",
+      background: saving ? "#806820" : "#d4af37",
+      color: "#080808",
+      border: "none",
+      borderRadius: "8px",
+      fontSize: "16px",
+      fontWeight: "bold",
+      cursor: saving ? "not-allowed" : "pointer"
+    },
+    success: {
+      color: "#6ee7a5",
+      background: "#123b2a",
+      border: "1px solid #246b46",
+      padding: "12px",
+      borderRadius: "7px",
+      fontSize: "14px",
+      marginBottom: "18px"
+    },
+    error: {
+      color: "#fca5a5",
+      background: "#351b1b",
+      border: "1px solid #713333",
+      padding: "12px",
+      borderRadius: "7px",
+      fontSize: "14px",
+      marginBottom: "18px"
+    },
+    footer: {
+      textAlign: "center",
+      color: "#777",
+      fontSize: "13px",
+      marginTop: "30px",
+      padding: "20px 0",
+      borderTop: "1px solid #292929"
+    }
+  };
+
   if (loading) {
     return (
       <div style={styles.loading}>
-        <p>Loading profile...</p>
+        Loading your profile...
       </div>
     );
   }
@@ -81,11 +235,16 @@ function CustomerProfile() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <a href="/customer-dashboard" style={styles.backLink}>
+
+        <Link
+          to="/customer-dashboard"
+          style={styles.backLink}
+        >
           ← Back to Dashboard
-        </a>
+        </Link>
 
         <div style={styles.card}>
+
           <div style={styles.header}>
             <div style={styles.avatar}>
               {name ? name.charAt(0).toUpperCase() : "U"}
@@ -95,7 +254,9 @@ function CustomerProfile() {
               SN WEB TECHNOLOGIES
             </h2>
 
-            <h3 style={styles.heading}>My Profile</h3>
+            <h1 style={styles.heading}>
+              My Profile
+            </h1>
 
             <p style={styles.subtitle}>
               Manage your personal account information
@@ -103,49 +264,78 @@ function CustomerProfile() {
           </div>
 
           <form onSubmit={handleSave}>
-            <label style={styles.label}>Full Name</label>
+
+            <label style={styles.label}>
+              Full Name
+            </label>
+
             <input
               type="text"
               placeholder="Enter your full name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setMessage("");
+              }}
               required
               style={styles.input}
             />
 
-            <label style={styles.label}>Mobile Number</label>
+            <label style={styles.label}>
+              Mobile Number
+            </label>
+
             <input
               type="tel"
               placeholder="Enter your mobile number"
               value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
+              onChange={(e) => {
+                setMobile(e.target.value);
+                setMessage("");
+              }}
               required
               style={styles.input}
             />
 
-            <label style={styles.label}>Email Address</label>
+            <label style={styles.label}>
+              Email Address
+            </label>
+
             <input
               type="email"
               value={email}
               disabled
-              style={{ ...styles.input, ...styles.disabledInput }}
+              style={{
+                ...styles.input,
+                ...styles.disabledInput
+              }}
             />
 
-            <label style={styles.label}>Your Address</label>
+            <label style={styles.label}>
+              Your Address
+            </label>
+
             <textarea
               placeholder="Enter your address"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              rows="4"
+              onChange={(e) => {
+                setAddress(e.target.value);
+                setMessage("");
+              }}
+              rows={4}
               style={styles.textarea}
             />
 
             {message && (
-              <p style={styles.success}>{message}</p>
+              <p style={styles.success}>
+                {message}
+              </p>
             )}
 
             {error && (
-              <p style={styles.error}>{error}</p>
+              <p style={styles.error}>
+                {error}
+              </p>
             )}
 
             <button
@@ -153,137 +343,19 @@ function CustomerProfile() {
               disabled={saving}
               style={styles.button}
             >
-              {saving ? "Saving..." : "Save Profile"}
+              {saving ? "Saving Profile..." : "Save Profile"}
             </button>
+
           </form>
         </div>
+
+        <footer style={styles.footer}>
+          © {new Date().getFullYear()} SN WEB TECHNOLOGIES. All Rights Reserved.
+        </footer>
+
       </div>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#f1f5f9",
-    padding: "35px 15px",
-    fontFamily: "Arial, sans-serif",
-    boxSizing: "border-box"
-  },
-  container: {
-    maxWidth: "550px",
-    margin: "0 auto"
-  },
-  loading: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "Arial"
-  },
-  backLink: {
-    display: "inline-block",
-    marginBottom: "20px",
-    color: "#2563eb",
-    textDecoration: "none",
-    fontWeight: "bold"
-  },
-  card: {
-    background: "white",
-    padding: "30px",
-    borderRadius: "16px",
-    boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
-    boxSizing: "border-box"
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "30px"
-  },
-  avatar: {
-    width: "75px",
-    height: "75px",
-    borderRadius: "50%",
-    background: "#2563eb",
-    color: "white",
-    fontSize: "30px",
-    fontWeight: "bold",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 15px"
-  },
-  company: {
-    color: "#1e40af",
-    fontSize: "20px",
-    margin: "10px 0"
-  },
-  heading: {
-    color: "#111827",
-    fontSize: "24px",
-    margin: "10px 0"
-  },
-  subtitle: {
-    color: "#64748b",
-    fontSize: "14px"
-  },
-  label: {
-    display: "block",
-    color: "#334155",
-    fontWeight: "bold",
-    fontSize: "14px",
-    marginBottom: "8px"
-  },
-  input: {
-    width: "100%",
-    padding: "13px",
-    marginBottom: "20px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "8px",
-    fontSize: "15px",
-    boxSizing: "border-box",
-    outlineColor: "#2563eb"
-  },
-  disabledInput: {
-    background: "#f1f5f9",
-    color: "#64748b"
-  },
-  textarea: {
-    width: "100%",
-    padding: "13px",
-    marginBottom: "20px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "8px",
-    fontSize: "15px",
-    boxSizing: "border-box",
-    resize: "vertical",
-    fontFamily: "Arial",
-    outlineColor: "#2563eb"
-  },
-  button: {
-    width: "100%",
-    padding: "14px",
-    background: "#2563eb",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    cursor: "pointer"
-  },
-  success: {
-    color: "#15803d",
-    background: "#dcfce7",
-    padding: "10px",
-    borderRadius: "6px",
-    fontSize: "14px"
-  },
-  error: {
-    color: "#dc2626",
-    background: "#fee2e2",
-    padding: "10px",
-    borderRadius: "6px",
-    fontSize: "14px"
-  }
-};
 
 export default CustomerProfile;
