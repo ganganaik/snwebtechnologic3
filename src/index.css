@@ -4,138 +4,27 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: #000;
-  color: white;
+  background: #080808;
+  color: #f8f5ed;
   font-family: Arial, sans-serif;
 }
 
-.app {
-  min-height: 100vh;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background: #050505;
-  border-bottom: 1px solid #d4af37;
-}
-
-.navbar h2 {
-  color: #d4af37;
-}
-
-.navbar a {
-  color: white;
-  text-decoration: none;
-  margin-left: 20px;
-}
-
-.hero {
-  text-align: center;
-  padding: 80px 20px;
-}
-
-.hero h1 {
-  font-size: 55px;
-  color: #d4af37;
-}
-
-.hero p {
-  margin: 15px;
-  font-size: 20px;
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 button {
-  margin-top: 20px;
-  padding: 14px 35px;
-  background: #d4af37;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
   cursor: pointer;
 }
 
-.services {
-  text-align: center;
-  padding: 50px 20px;
-}
-
-.cards {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.cards div {
-  background: #111;
-  border: 1px solid #d4af37;
-  padding: 25px;
-  width: 280px;
-  border-radius: 12px;
-}
-
-.cards h3 {
-  color: #d4af37;
-}
-
-footer {
-  text-align: center;
-  padding: 30px;
-  border-top: 1px solid #d4af37;
-  margin-top: 50px;
-  color: #ccc;
-}
-.order {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.order h2 {
-  color: #d4af37;
-  font-size: 35px;
-  margin-bottom: 15px;
-}
-
-.order input,
-.order select,
-.order textarea {
-  display: block;
-  width: 90%;
-  max-width: 500px;
-  margin: 15px auto;
-  padding: 15px;
-  background: #111;
-  color: white;
-  border: 1px solid #d4af37;
-  border-radius: 8px;
-}
-
-.order textarea {
-  height: 120px;
-}
-
-.payment {
-  margin-top: 50px;
-  padding: 30px;
-  border: 1px solid #d4af37;
-  border-radius: 15px;
-}
-
-.payment h2 {
-  color: #d4af37;
-}
-
-.qr {
-  margin: 20px auto;
-  width: 180px;
-  height: 180px;
-  border: 2px dashed #d4af37;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d4af37;
+a {
+  -webkit-tap-highlight-color: transparent;
 }
