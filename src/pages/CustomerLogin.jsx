@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
@@ -15,7 +16,7 @@ function CustomerLogin() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "/";
+      window.location.href = "/customer-dashboard";
     } catch (error) {
       setError("Email or password is incorrect.");
     } finally {
