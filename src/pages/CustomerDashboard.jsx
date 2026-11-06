@@ -116,7 +116,7 @@ function CustomerDashboard() {
             <p>Track your orders</p>
           </Link>
 
-          <Link to="/my-orders" style={styles.card}>
+          <Link to="/order-history" style={styles.card}>
             <span style={styles.icon}>🕒</span>
             <h3>Order History</h3>
             <p>View all past orders</p>
