@@ -342,7 +342,6 @@ function Home() {
                 type="email"
                 value={form.email}
                 readOnly
-                id="customer-email"
               />
 
               <label htmlFor="customer-service">Choose Service</label>
