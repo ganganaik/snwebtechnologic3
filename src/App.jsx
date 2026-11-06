@@ -18,7 +18,7 @@ function Home() {
   const [form, setForm] = useState({
     name: "",
     mobile: "",
-    email: "",
+    email: auth.currentUser?.email || "",
     service: "",
     details: ""
   });
@@ -39,6 +39,15 @@ function Home() {
 
   const submitOrder = async () => {
     try {
+      if (
+        !auth.currentUser ||
+        form.email.trim().toLowerCase() !==
+          auth.currentUser.email?.toLowerCase()
+      ) {
+        alert("Please use the email address linked to your account.");
+        return;
+      }
+
       await addDoc(collection(db, "orders"), form);
 
       alert("Order Submitted Successfully!");
@@ -46,7 +55,7 @@ function Home() {
       setForm({
         name: "",
         mobile: "",
-        email: "",
+        email: auth.currentUser?.email || "",
         service: "",
         details: ""
       });
@@ -141,9 +150,7 @@ function Home() {
           type="email"
           placeholder="Email Address"
           value={form.email}
-          onChange={(e) =>
-            setForm({ ...form, email: e.target.value })
-          }
+          readOnly
         />
 
         <select
