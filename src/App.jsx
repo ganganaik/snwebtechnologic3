@@ -1,3 +1,4 @@
+
 import "./App.css";
 import { Routes, Route, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -20,6 +21,8 @@ import MyOrders from "./pages/MyOrders";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import OrderHistory from "./pages/OrderHistory";
 import Services from "./pages/Services";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 function Home() {
   const [form, setForm] = useState({
@@ -121,8 +124,8 @@ function Home() {
         <div className={`nav-links ${menuOpen ? "open" : ""}`}>
           <a href="#home" onClick={closeMenu}>Home</a>
           <Link to="/services" onClick={closeMenu}>Services</Link>
-          <a href="#about" onClick={closeMenu}>About</a>
-          <a href="#contact" onClick={closeMenu}>Contact</a>
+          <Link to="/about" onClick={closeMenu}>About</Link>
+          <Link to="/contact" onClick={closeMenu}>Contact</Link>
           <Link to="/customer-dashboard" onClick={closeMenu}>Dashboard</Link>
           <Link to="/customer-profile" onClick={closeMenu}>My Profile</Link>
           <Link to="/my-orders" onClick={closeMenu}>My Orders</Link>
@@ -500,6 +503,8 @@ function App() {
       <Route path="/" element={<HomeGate />} />
 
       <Route path="/services" element={<Services />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
 
       <Route path="/customer-signup" element={<CustomerSignup />} />
       <Route path="/customer-login" element={<CustomerLogin />} />
