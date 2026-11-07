@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 function About() {
@@ -33,6 +34,12 @@ function About() {
           border: 1px solid #d6ad55;
           padding: 10px 18px;
           border-radius: 6px;
+          transition: 0.3s;
+        }
+
+        .about-back:hover {
+          background: #d6ad55;
+          color: #080808;
         }
 
         .about-hero {
@@ -75,7 +82,7 @@ function About() {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 35px;
-          align-items: center;
+          align-items: stretch;
         }
 
         .about-card {
@@ -142,6 +149,12 @@ function About() {
           border: 1px solid #3b3020;
           padding: 28px 20px;
           border-radius: 12px;
+          transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .value-card:hover {
+          transform: translateY(-5px);
+          border-color: #d6ad55;
         }
 
         .value-card h3 {
@@ -172,6 +185,7 @@ function About() {
         .about-cta p {
           color: #c3bdb0;
           margin-bottom: 25px;
+          line-height: 1.7;
         }
 
         .about-button {
@@ -182,6 +196,19 @@ function About() {
           border-radius: 6px;
           text-decoration: none;
           font-weight: bold;
+          transition: 0.3s;
+        }
+
+        .about-button:hover {
+          background: #efc96e;
+          transform: translateY(-2px);
+        }
+
+        .about-back:focus-visible,
+        .about-logo:focus-visible,
+        .about-button:focus-visible {
+          outline: 2px solid #fff;
+          outline-offset: 4px;
         }
 
         .about-footer {
@@ -192,9 +219,16 @@ function About() {
           font-size: 13px;
         }
 
+        @media (max-width: 900px) {
+          .values-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
         @media (max-width: 760px) {
           .about-grid {
             grid-template-columns: 1fr;
+            gap: 22px;
           }
 
           .values-grid {
@@ -212,6 +246,10 @@ function About() {
           .about-content {
             padding: 45px 17px;
           }
+
+          .about-values {
+            margin-top: 40px;
+          }
         }
 
         @media (max-width: 420px) {
@@ -220,24 +258,45 @@ function About() {
           }
 
           .about-logo {
-            font-size: 19px;
+            font-size: 17px;
           }
 
           .about-back {
             padding: 9px 12px;
             font-size: 13px;
           }
+
+          .about-hero h1 {
+            font-size: 36px;
+          }
+
+          .about-card {
+            padding: 22px;
+          }
+
+          .about-cta h2 {
+            font-size: 25px;
+          }
         }
       `}</style>
 
       <header className="about-header">
-        <Link to="/" className="about-logo">SN WEB TECHNOLOGIES</Link>
-        <Link to="/" className="about-back">← Home</Link>
+        <Link to="/" className="about-logo">
+          SN WEB TECHNOLOGIES
+        </Link>
+
+        <Link to="/" className="about-back">
+          ← Home
+        </Link>
       </header>
 
       <section className="about-hero">
         <div className="about-label">WHO WE ARE</div>
-        <h1>About <span>Us</span></h1>
+
+        <h1>
+          About <span>Us</span>
+        </h1>
+
         <p>
           We turn ideas into digital experiences. SN WEB TECHNOLOGIES
           is focused on creating modern websites and practical digital
@@ -249,13 +308,16 @@ function About() {
         <div className="about-grid">
           <div className="about-card">
             <h2>Our Story</h2>
+
             <p>
               SN WEB TECHNOLOGIES was created with a vision to make
               professional web solutions accessible to businesses
               and individuals. We believe every idea deserves a strong
               digital presence.
             </p>
+
             <br />
+
             <p>
               Our focus is on clean design, useful features, smooth
               user experiences and reliable digital solutions.
@@ -265,6 +327,7 @@ function About() {
           <div className="about-card about-highlight">
             <strong>SN</strong>
             <span>WEB TECHNOLOGIES</span>
+
             <p style={{ marginTop: "18px" }}>
               Your Vision, Our Creation.
             </p>
@@ -274,6 +337,7 @@ function About() {
         <div className="about-grid" style={{ marginTop: "25px" }}>
           <div className="about-card">
             <h2>Our Mission</h2>
+
             <p>
               Our mission is to help businesses build a strong online
               identity through quality website development, creative
@@ -283,18 +347,25 @@ function About() {
 
           <div className="about-card">
             <h2>Our Founder</h2>
+
             <p>
               Founded by Ganga Naik, SN WEB TECHNOLOGIES is driven by
               a passion for technology, creativity and building
               meaningful digital experiences.
             </p>
+
             <br />
-            <p><strong>Location:</strong> Mayurbhanj, Odisha, India</p>
+
+            <p>
+              <strong>Location:</strong> Mayurbhanj, Odisha, India
+            </p>
           </div>
         </div>
 
         <section className="about-values">
-          <h2>What We <span>Believe In</span></h2>
+          <h2>
+            What We <span>Believe In</span>
+          </h2>
 
           <div className="values-grid">
             <div className="value-card">
@@ -325,8 +396,12 @@ function About() {
 
         <section className="about-cta">
           <h2>Let's Build Something Great</h2>
-          <p>Have a project idea? Let's discuss how we can help.</p>
-          <Link to="/#contact" className="about-button">
+
+          <p>
+            Have a project idea? Let's discuss how we can help.
+          </p>
+
+          <Link to="/contact" className="about-button">
             Contact Us
           </Link>
         </section>
