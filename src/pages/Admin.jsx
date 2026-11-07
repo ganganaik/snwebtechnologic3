@@ -1,4 +1,6 @@
+
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import {
   collection,
@@ -381,9 +383,15 @@ function Admin() {
               Admin Dashboard
             </h2>
           </div>
-          <button onClick={handleLogout} style={styles.logout}>
-            Logout
-          </button>
+
+          <div style={styles.headerActions}>
+            <Link to="/admin-chats" style={styles.chatButton}>
+              💬 Customer Chats
+            </Link>
+            <button onClick={handleLogout} style={styles.logout}>
+              Logout
+            </button>
+          </div>
         </header>
 
         <section style={styles.summary} className="admin-section">
@@ -737,6 +745,24 @@ const styles = {
     marginBottom: "25px",
     padding: "18px 0",
     borderBottom: "1px solid #55451f",
+  },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+  chatButton: {
+    display: "inline-block",
+    background: "#d4af37",
+    color: "#080808",
+    border: "none",
+    borderRadius: "7px",
+    padding: "11px 16px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    textDecoration: "none",
+    textAlign: "center",
   },
   company: {
     color: "#d4af37",
