@@ -47,6 +47,30 @@ function MyOrders() {
     return () => unsubscribe();
   }, []);
 
+  const formatOrderDate = (createdAt) => {
+    if (!createdAt) return "Date not available";
+
+    try {
+      const date = createdAt.toDate
+        ? createdAt.toDate()
+        : new Date(createdAt);
+
+      if (isNaN(date.getTime())) {
+        return "Date not available";
+      }
+
+      return date.toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    } catch {
+      return "Date not available";
+    }
+  };
+
   const getStatusStyle = (status) => {
     const currentStatus = (status || "Pending").toLowerCase();
 
@@ -275,6 +299,14 @@ function MyOrders() {
                 <h3 style={styles.service}>
                   {order.service || "Service Order"}
                 </h3>
+
+                <p style={styles.info}>
+                  <b>Order ID:</b> {order.id}
+                </p>
+
+                <p style={styles.info}>
+                  <b>Order Date:</b> {formatOrderDate(order.createdAt)}
+                </p>
 
                 <p style={styles.info}>
                   <b>Name:</b> {order.name || "Not provided"}
