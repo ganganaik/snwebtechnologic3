@@ -245,6 +245,149 @@ function Home() {
           </div>
         </section>
 
+        {/* WHY CHOOSE US SECTION */}
+        <section className="why-section section-space">
+          <style>{`
+            .why-section {
+              padding: 85px 7%;
+              background: #0d0d0d;
+            }
+
+            .why-heading {
+              text-align: center;
+              max-width: 700px;
+              margin: 0 auto 45px;
+            }
+
+            .why-heading h2 {
+              font-size: clamp(30px, 5vw, 44px);
+              margin: 14px 0;
+              color: #f8f5ed;
+            }
+
+            .why-heading h2 span {
+              color: #d6ad55;
+            }
+
+            .why-heading p {
+              color: #aaa;
+              line-height: 1.7;
+            }
+
+            .why-grid {
+              display: grid;
+              grid-template-columns: repeat(4, minmax(0, 1fr));
+              gap: 20px;
+              max-width: 1200px;
+              margin: auto;
+            }
+
+            .why-card {
+              background: #151515;
+              border: 1px solid rgba(214, 173, 85, 0.2);
+              border-radius: 14px;
+              padding: 28px 22px;
+              transition: transform 0.25s ease, border-color 0.25s ease;
+            }
+
+            .why-card:hover {
+              transform: translateY(-6px);
+              border-color: #d6ad55;
+            }
+
+            .why-icon {
+              width: 48px;
+              height: 48px;
+              display: grid;
+              place-items: center;
+              border-radius: 12px;
+              background: rgba(214, 173, 85, 0.12);
+              color: #d6ad55;
+              font-size: 25px;
+              margin-bottom: 20px;
+            }
+
+            .why-card h3 {
+              color: #f8f5ed;
+              font-size: 18px;
+              margin-bottom: 12px;
+            }
+
+            .why-card p {
+              color: #aaa;
+              font-size: 14px;
+              line-height: 1.7;
+            }
+
+            @media (max-width: 900px) {
+              .why-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+              }
+            }
+
+            @media (max-width: 520px) {
+              .why-section {
+                padding: 60px 5%;
+              }
+
+              .why-grid {
+                grid-template-columns: 1fr;
+              }
+
+              .why-card {
+                padding: 24px 20px;
+              }
+            }
+          `}</style>
+
+          <div className="why-heading">
+            <span className="eyebrow">THE SN DIFFERENCE</span>
+            <h2>Why Choose <span>SN Web Technologies?</span></h2>
+            <p>
+              We focus on understanding your requirements and creating
+              useful digital solutions for your business.
+            </p>
+          </div>
+
+          <div className="why-grid">
+            <article className="why-card">
+              <div className="why-icon">⌘</div>
+              <h3>Professional Development</h3>
+              <p>
+                Websites developed with care, quality and attention
+                to your business requirements.
+              </p>
+            </article>
+
+            <article className="why-card">
+              <div className="why-icon">✧</div>
+              <h3>Modern Responsive Design</h3>
+              <p>
+                Clean and modern designs made to work across
+                mobile phones, tablets and computers.
+              </p>
+            </article>
+
+            <article className="why-card">
+              <div className="why-icon">♡</div>
+              <h3>Customer Focused</h3>
+              <p>
+                Your ideas and requirements guide our approach
+                throughout the project.
+              </p>
+            </article>
+
+            <article className="why-card">
+              <div className="why-icon">↗</div>
+              <h3>Project Support</h3>
+              <p>
+                Clear communication and support during the
+                project development process.
+              </p>
+            </article>
+          </div>
+        </section>
+
         <section className="about-section section-space" id="about">
           <div className="about-decoration">SN</div>
 
