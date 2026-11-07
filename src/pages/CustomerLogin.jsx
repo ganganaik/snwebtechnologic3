@@ -100,6 +100,20 @@ function CustomerLogin() {
           }}
         />
 
+        <div style={{ textAlign: "right", marginBottom: "15px" }}>
+          <a
+            href="/forgot-password"
+            style={{
+              color: "#2563eb",
+              fontSize: "14px",
+              textDecoration: "none",
+              fontWeight: "bold"
+            }}
+          >
+            Forgot Password?
+          </a>
+        </div>
+
         {error && (
           <p style={{ color: "#dc2626", fontSize: "14px" }}>
             {error}
