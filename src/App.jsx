@@ -120,7 +120,7 @@ function Home() {
 
         <div className={`nav-links ${menuOpen ? "open" : ""}`}>
           <a href="#home" onClick={closeMenu}>Home</a>
-          <a href="#services" onClick={closeMenu}>Services</a>
+          <Link to="/services" onClick={closeMenu}>Services</Link>
           <a href="#about" onClick={closeMenu}>About</a>
           <a href="#contact" onClick={closeMenu}>Contact</a>
           <Link to="/customer-dashboard" onClick={closeMenu}>Dashboard</Link>
