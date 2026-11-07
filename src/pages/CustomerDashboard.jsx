@@ -1,7 +1,13 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signOut,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword
+} from "firebase/auth";
 import {
   collection,
   getDocs,
@@ -19,6 +25,13 @@ function CustomerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -70,6 +83,73 @@ function CustomerDashboard() {
       console.error(err);
       setLoggingOut(false);
       alert("Logout failed. Please try again.");
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    setPasswordMessage("");
+    setPasswordError("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError("Please fill in all password fields.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New password and confirm password do not match.");
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordError("New password must be different from current password.");
+      return;
+    }
+
+    if (!user?.email) {
+      setPasswordError("User email not available. Please login again.");
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        currentPassword
+      );
+
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      setPasswordMessage("Your password has been changed successfully.");
+    } catch (err) {
+      console.error(err);
+
+      if (
+        err.code === "auth/wrong-password" ||
+        err.code === "auth/invalid-credential"
+      ) {
+        setPasswordError("Current password is incorrect.");
+      } else if (err.code === "auth/weak-password") {
+        setPasswordError("Please choose a stronger password.");
+      } else if (err.code === "auth/requires-recent-login") {
+        setPasswordError("Please logout and login again, then try changing your password.");
+      } else {
+        setPasswordError("Unable to change password. Please try again.");
+      }
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -224,6 +304,84 @@ function CustomerDashboard() {
               <span style={styles.cardArrow}>→</span>
             </Link>
           </div>
+        </section>
+
+        <section style={styles.passwordSection}>
+          <div style={styles.panelHeading}>
+            <div>
+              <span style={styles.panelEyebrow}>ACCOUNT SECURITY</span>
+              <h2>Change Password</h2>
+            </div>
+            <span style={styles.passwordIcon}>🔒</span>
+          </div>
+
+          <p style={styles.passwordDescription}>
+            Keep your account secure by updating your password.
+          </p>
+
+          {passwordMessage && (
+            <div style={styles.successMessage}>
+              {passwordMessage}
+            </div>
+          )}
+
+          {passwordError && (
+            <div style={styles.error}>
+              {passwordError}
+            </div>
+          )}
+
+          <form onSubmit={handleChangePassword}>
+            <div style={styles.passwordField}>
+              <label style={styles.passwordLabel}>Current Password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                autoComplete="current-password"
+                style={styles.passwordInput}
+                disabled={passwordLoading}
+              />
+            </div>
+
+            <div style={styles.passwordField}>
+              <label style={styles.passwordLabel}>New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                autoComplete="new-password"
+                style={styles.passwordInput}
+                disabled={passwordLoading}
+              />
+            </div>
+
+            <div style={styles.passwordField}>
+              <label style={styles.passwordLabel}>Confirm New Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                autoComplete="new-password"
+                style={styles.passwordInput}
+                disabled={passwordLoading}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={passwordLoading}
+              style={{
+                ...styles.passwordButton,
+                opacity: passwordLoading ? 0.6 : 1
+              }}
+            >
+              {passwordLoading ? "Updating Password..." : "Update Password"}
+            </button>
+          </form>
         </section>
 
         <section style={styles.contentGrid}>
@@ -489,6 +647,64 @@ const styles = {
     marginTop: "12px",
     color: "#d4af37",
     fontWeight: "bold"
+  },
+  passwordSection: {
+    background: "#141414",
+    padding: "25px",
+    border: "1px solid #39301c",
+    borderRadius: "14px",
+    marginBottom: "35px",
+    maxWidth: "650px"
+  },
+  passwordIcon: {
+    fontSize: "28px"
+  },
+  passwordDescription: {
+    color: "#aaa69d",
+    fontSize: "13px",
+    margin: "15px 0 22px"
+  },
+  passwordField: {
+    marginBottom: "17px"
+  },
+  passwordLabel: {
+    display: "block",
+    color: "#e5c45f",
+    fontSize: "13px",
+    fontWeight: "bold",
+    marginBottom: "8px"
+  },
+  passwordInput: {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "13px",
+    background: "#080808",
+    border: "1px solid #514326",
+    borderRadius: "7px",
+    color: "#fff",
+    fontSize: "14px",
+    outline: "none"
+  },
+  passwordButton: {
+    width: "100%",
+    padding: "13px",
+    background: "#d4af37",
+    color: "#080808",
+    border: "none",
+    borderRadius: "7px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    fontSize: "14px",
+    marginTop: "5px"
+  },
+  successMessage: {
+    background: "rgba(34,197,94,0.12)",
+    color: "#4ade80",
+    border: "1px solid rgba(34,197,94,0.3)",
+    padding: "12px",
+    borderRadius: "7px",
+    marginBottom: "18px",
+    fontSize: "13px"
   },
   contentGrid: {
     display: "grid",
