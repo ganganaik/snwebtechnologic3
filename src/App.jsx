@@ -421,14 +421,23 @@ function Home() {
               Building modern digital experiences
               for a better online future.
             </p>
+            <p>
+              Email:{" "}
+              <a
+                href="mailto:twelvefailuresth@gmail.com"
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                twelvefailuresth@gmail.com
+              </a>
+            </p>
           </div>
 
           <div className="footer-links">
             <strong>Quick Links</strong>
             <a href="#home">Home</a>
-            <a href="#services">Services</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
+            <Link to="/services">Services</Link>
+            <Link to="/about">About</Link>
+            <Link to="/contact">Contact</Link>
           </div>
 
           <div className="footer-links">
