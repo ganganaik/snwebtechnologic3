@@ -23,6 +23,8 @@ import OrderHistory from "./pages/OrderHistory";
 import Services from "./pages/Services";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import CustomerChat from "./pages/CustomerChat";
+import AdminChats from "./pages/AdminChats";
 
 function Home() {
   const [form, setForm] = useState({
@@ -726,6 +728,8 @@ function App() {
       <Route path="/order-history" element={<OrderHistory />} />
       <Route path="/customer-dashboard" element={<CustomerDashboard />} />
 
+      <Route path="/customer-chat" element={<CustomerChat />} />
+
       <Route path="/admin-login" element={<AdminLogin />} />
 
       <Route
@@ -733,6 +737,15 @@ function App() {
         element={
           <ProtectedRoute>
             <Admin />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin-chats"
+        element={
+          <ProtectedRoute>
+            <AdminChats />
           </ProtectedRoute>
         }
       />
