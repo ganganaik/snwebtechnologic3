@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 function Services() {
@@ -145,7 +146,7 @@ function Services() {
           border: 1px solid #29251a;
           border-radius: 14px;
           padding: 32px;
-          transition: 0.3s;
+          transition: transform 0.3s, border-color 0.3s;
         }
 
         .service-detail-card:hover {
@@ -169,6 +170,7 @@ function Services() {
           color: #d4af37;
           font-size: 14px;
           margin-bottom: 18px;
+          line-height: 1.6;
         }
 
         .service-description {
@@ -185,6 +187,8 @@ function Services() {
 
         .service-features {
           list-style: none;
+          padding: 0;
+          margin: 0;
           display: grid;
           gap: 13px;
         }
@@ -243,6 +247,12 @@ function Services() {
           transform: translateY(-2px);
         }
 
+        .services-back:focus-visible,
+        .services-contact a:focus-visible {
+          outline: 2px solid #fff;
+          outline-offset: 4px;
+        }
+
         .services-footer {
           text-align: center;
           padding: 25px 15px;
@@ -253,6 +263,18 @@ function Services() {
 
         .services-footer span {
           color: #d4af37;
+        }
+
+        @media (max-width: 900px) {
+          .services-list {
+            padding-left: 20px;
+            padding-right: 20px;
+          }
+
+          .services-contact {
+            margin-left: 20px;
+            margin-right: 20px;
+          }
         }
 
         @media (max-width: 700px) {
@@ -281,7 +303,8 @@ function Services() {
 
         @media (max-width: 380px) {
           .services-logo {
-            font-size: 19px;
+            font-size: 16px;
+            letter-spacing: 1px;
           }
 
           .services-back {
@@ -289,10 +312,20 @@ function Services() {
             font-size: 12px;
           }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+          .service-detail-card,
+          .services-back,
+          .services-contact a {
+            transition: none;
+          }
+        }
       `}</style>
 
       <header className="services-topbar">
-        <div className="services-logo">SN WEB TECHNOLOGIES</div>
+        <div className="services-logo">
+          SN WEB TECHNOLOGIES
+        </div>
 
         <Link to="/" className="services-back">
           ← Back to Home
@@ -316,7 +349,9 @@ function Services() {
       <section className="services-list">
         {services.map((service) => (
           <div className="service-detail-card" key={service.number}>
-            <div className="service-number">{service.number}</div>
+            <div className="service-number">
+              {service.number}
+            </div>
 
             <h2>{service.title}</h2>
 
@@ -333,7 +368,7 @@ function Services() {
             <ul className="service-features">
               {service.features.map((feature) => (
                 <li key={feature}>
-                  <span>✓</span>
+                  <span aria-hidden="true">✓</span>
                   {feature}
                 </li>
               ))}
@@ -352,7 +387,7 @@ function Services() {
           solution for your business.
         </p>
 
-        <Link to="/#contact">
+        <Link to="/contact">
           Contact Us
         </Link>
       </section>
