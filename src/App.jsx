@@ -590,15 +590,26 @@ function Home() {
 
             <div className="upi-box">
               <span>UPI ID</span>
-              <strong>7846944419@ybl</strong>
+              <strong>gm627@ybl</strong>
             </div>
 
             <div className="qr">
-              QR CODE WILL BE ADDED SOON
+              <img
+                src="/payment-qr.png"
+                alt="Payment QR Code for gm627@ybl"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  maxWidth: "280px",
+                  height: "auto",
+                  margin: "0 auto",
+                  borderRadius: "10px",
+                }}
+              />
             </div>
 
             <small>
-              Please verify the recipient details in your payment app
+              Please verify that the recipient UPI ID is gm627@ybl
               before confirming any transaction.
             </small>
           </div>
