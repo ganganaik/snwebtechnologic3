@@ -12,22 +12,51 @@ function Contact() {
     message: "",
   });
 
+  const [feedback, setFeedback] = useState("");
+  const [feedbackType, setFeedbackType] = useState("success");
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setFeedback("");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const subject = encodeURIComponent(form.subject);
+    if (
+      !form.name.trim() ||
+      !form.email.trim() ||
+      !form.subject.trim() ||
+      !form.message.trim()
+    ) {
+      setFeedbackType("error");
+      setFeedback("Please fill in all fields before submitting.");
+      return;
+    }
+
+    const subject = encodeURIComponent(form.subject.trim());
+
     const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`
+      `Name: ${form.name.trim()}\nEmail: ${form.email.trim()}\n\nMessage:\n${form.message.trim()}`
     );
 
     const gmailUrl =
       `https://mail.google.com/mail/?view=cm&fs=1&to=${businessEmail}&su=${subject}&body=${body}`;
 
-    window.open(gmailUrl, "_blank");
+    const gmailWindow = window.open(gmailUrl, "_blank");
+
+    if (!gmailWindow) {
+      setFeedbackType("error");
+      setFeedback(
+        "Gmail could not open. Please allow pop-ups in your browser and try again."
+      );
+      return;
+    }
+
+    setFeedbackType("success");
+    setFeedback(
+      "Gmail has opened with your enquiry. Please review the email and press Send to complete it."
+    );
 
     setForm({
       name: "",
@@ -186,6 +215,26 @@ function Contact() {
           background: #efc96e;
         }
 
+        .contact-feedback {
+          margin-top: 18px;
+          padding: 13px;
+          border-radius: 6px;
+          line-height: 1.6;
+          font-size: 14px;
+        }
+
+        .contact-feedback.success {
+          background: #172318;
+          border: 1px solid #47764c;
+          color: #b9e6bd;
+        }
+
+        .contact-feedback.error {
+          background: #2a1717;
+          border: 1px solid #914545;
+          color: #ffbaba;
+        }
+
         .contact-footer {
           border-top: 1px solid #302719;
           text-align: center;
@@ -230,6 +279,7 @@ function Contact() {
         <Link to="/" className="contact-logo">
           SN WEB TECHNOLOGIES
         </Link>
+
         <Link to="/" className="contact-back">
           ← Home
         </Link>
@@ -237,7 +287,9 @@ function Contact() {
 
       <section className="contact-hero">
         <span>GET IN TOUCH</span>
-        <h1>Contact <strong>Us</strong></h1>
+        <h1>
+          Contact <strong>Us</strong>
+        </h1>
         <p>
           Have a project or question? Send us an enquiry.
           We would love to hear from you.
@@ -247,6 +299,7 @@ function Contact() {
       <main className="contact-content">
         <section className="contact-info">
           <h2>Let's Talk</h2>
+
           <p>
             Tell us about your project, requirements or ideas.
             Our team will be happy to hear from you.
@@ -322,6 +375,16 @@ function Contact() {
             <button type="submit" className="contact-submit">
               Send Enquiry Through Gmail
             </button>
+
+            {feedback && (
+              <div
+                className={`contact-feedback ${feedbackType}`}
+                role="status"
+                aria-live="polite"
+              >
+                {feedback}
+              </div>
+            )}
           </form>
         </section>
       </main>
