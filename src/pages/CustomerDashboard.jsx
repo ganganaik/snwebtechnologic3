@@ -303,6 +303,13 @@ function CustomerDashboard() {
               <p>See your previous orders</p>
               <span style={styles.cardArrow}>→</span>
             </Link>
+
+            <Link to="/customer-chat" style={styles.quickCard}>
+              <span style={styles.quickIcon}>💬</span>
+              <h3>Customer Support Chat</h3>
+              <p>Chat directly with our admin team</p>
+              <span style={styles.cardArrow}>→</span>
+            </Link>
           </div>
         </section>
 
