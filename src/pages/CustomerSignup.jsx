@@ -41,30 +41,50 @@ function CustomerSignup() {
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      background: "#f3f4f6",
-      fontFamily: "Arial",
-    }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f3f4f6",
+        fontFamily: "Arial",
+        padding: "20px",
+        boxSizing: "border-box",
+      }}
+    >
       <form
         onSubmit={handleSignup}
         style={{
-          background: "white",
+          background: "#ffffff",
           padding: "30px",
           borderRadius: "12px",
           width: "90%",
           maxWidth: "380px",
           boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+          boxSizing: "border-box",
         }}
       >
-        <h2 style={{ textAlign: "center" }}>
+        <h2
+          style={{
+            textAlign: "center",
+            color: "#111827",
+            fontSize: "24px",
+            fontWeight: "bold",
+            marginBottom: "15px",
+          }}
+        >
           SN WEB TECHNOLOGIES
         </h2>
 
-        <h3 style={{ textAlign: "center" }}>
+        <h3
+          style={{
+            textAlign: "center",
+            color: "#111827",
+            fontSize: "22px",
+            marginBottom: "20px",
+          }}
+        >
           Customer Signup
         </h3>
 
@@ -106,7 +126,9 @@ function CustomerSignup() {
         />
 
         {error && (
-          <p style={{ color: "red" }}>{error}</p>
+          <p style={{ color: "#dc2626", fontSize: "14px" }}>
+            {error}
+          </p>
         )}
 
         <button
@@ -116,13 +138,30 @@ function CustomerSignup() {
             width: "100%",
             padding: "12px",
             background: "#111827",
-            color: "white",
+            color: "#ffffff",
             border: "none",
             borderRadius: "6px",
+            fontSize: "16px",
+            cursor: "pointer",
           }}
         >
           {loading ? "Creating Account..." : "Sign Up"}
         </button>
+
+        <style>{`
+          input {
+            color: #111827 !important;
+            background: #ffffff !important;
+            border: 1px solid #9ca3af;
+            border-radius: 6px;
+            font-size: 16px;
+          }
+
+          input::placeholder {
+            color: #6b7280 !important;
+            opacity: 1;
+          }
+        `}</style>
       </form>
     </div>
   );
