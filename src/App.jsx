@@ -19,6 +19,7 @@ import CustomerProfile from "./pages/CustomerProfile";
 import MyOrders from "./pages/MyOrders";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import OrderHistory from "./pages/OrderHistory";
+import Services from "./pages/Services";
 
 function Home() {
   const [form, setForm] = useState({
@@ -497,6 +498,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomeGate />} />
+
+      <Route path="/services" element={<Services />} />
 
       <Route path="/customer-signup" element={<CustomerSignup />} />
       <Route path="/customer-login" element={<CustomerLogin />} />
