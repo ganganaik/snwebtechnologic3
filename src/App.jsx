@@ -35,6 +35,8 @@ function Home() {
 
   const [loggingOut, setLoggingOut] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submissionMessage, setSubmissionMessage] = useState("");
+  const [submissionError, setSubmissionError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -52,37 +54,54 @@ function Home() {
   const submitOrder = async () => {
     if (submitting) return;
 
+    setSubmissionMessage("");
+    setSubmissionError(false);
+
+    if (
+      !auth.currentUser ||
+      form.email.trim().toLowerCase() !==
+        auth.currentUser.email?.toLowerCase()
+    ) {
+      setSubmissionError(true);
+      setSubmissionMessage(
+        "Please use the email address linked to your account."
+      );
+      return;
+    }
+
+    if (
+      !form.name.trim() ||
+      !form.mobile.trim() ||
+      !form.service ||
+      !form.details.trim()
+    ) {
+      setSubmissionError(true);
+      setSubmissionMessage("Please fill in all project details.");
+      return;
+    }
+
+    if (!/^[0-9+\-\s()]{7,20}$/.test(form.mobile.trim())) {
+      setSubmissionError(true);
+      setSubmissionMessage("Please enter a valid mobile number.");
+      return;
+    }
+
     try {
-      if (
-        !auth.currentUser ||
-        form.email.trim().toLowerCase() !==
-          auth.currentUser.email?.toLowerCase()
-      ) {
-        alert("Please use the email address linked to your account.");
-        return;
-      }
-
-      if (
-        !form.name.trim() ||
-        !form.mobile.trim() ||
-        !form.service ||
-        !form.details.trim()
-      ) {
-        alert("Please fill in all project details.");
-        return;
-      }
-
       setSubmitting(true);
 
       await addDoc(collection(db, "orders"), {
         ...form,
         name: form.name.trim(),
         mobile: form.mobile.trim(),
+        email: auth.currentUser.email,
         details: form.details.trim(),
         createdAt: serverTimestamp(),
       });
 
-      alert("Order Submitted Successfully!");
+      setSubmissionError(false);
+      setSubmissionMessage(
+        "Your project enquiry has been submitted successfully!"
+      );
 
       setForm({
         name: "",
@@ -92,8 +111,11 @@ function Home() {
         details: "",
       });
     } catch (error) {
-      alert("Unable to submit order. Please try again.");
-      console.error(error);
+      setSubmissionError(true);
+      setSubmissionMessage(
+        "Unable to submit your enquiry. Please check your connection and try again."
+      );
+      console.error("Order submission error:", error);
     } finally {
       setSubmitting(false);
     }
@@ -245,7 +267,6 @@ function Home() {
           </div>
         </section>
 
-        {/* WHY CHOOSE US SECTION */}
         <section className="why-section section-space">
           <style>{`
             .why-section {
@@ -467,9 +488,10 @@ function Home() {
                 type="text"
                 placeholder="Enter your full name"
                 value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
+                onChange={(e) => {
+                  setForm({ ...form, name: e.target.value });
+                  setSubmissionMessage("");
+                }}
               />
 
               <label htmlFor="customer-mobile">Mobile Number</label>
@@ -478,9 +500,10 @@ function Home() {
                 type="tel"
                 placeholder="Enter your mobile number"
                 value={form.mobile}
-                onChange={(e) =>
-                  setForm({ ...form, mobile: e.target.value })
-                }
+                onChange={(e) => {
+                  setForm({ ...form, mobile: e.target.value });
+                  setSubmissionMessage("");
+                }}
               />
 
               <label htmlFor="customer-email">Email Address</label>
@@ -495,9 +518,10 @@ function Home() {
               <select
                 id="customer-service"
                 value={form.service}
-                onChange={(e) =>
-                  setForm({ ...form, service: e.target.value })
-                }
+                onChange={(e) => {
+                  setForm({ ...form, service: e.target.value });
+                  setSubmissionMessage("");
+                }}
               >
                 <option value="">Select a service</option>
                 <option>Website Development</option>
@@ -510,17 +534,42 @@ function Home() {
                 id="project-details"
                 placeholder="Describe your project and requirements..."
                 value={form.details}
-                onChange={(e) =>
-                  setForm({ ...form, details: e.target.value })
-                }
+                onChange={(e) => {
+                  setForm({ ...form, details: e.target.value });
+                  setSubmissionMessage("");
+                }}
               />
+
+              {submissionMessage && (
+                <div
+                  role={submissionError ? "alert" : "status"}
+                  aria-live="polite"
+                  style={{
+                    marginTop: "18px",
+                    padding: "13px 15px",
+                    borderRadius: "7px",
+                    background: submissionError
+                      ? "rgba(220, 70, 70, 0.12)"
+                      : "rgba(70, 180, 110, 0.12)",
+                    border: submissionError
+                      ? "1px solid rgba(220, 90, 90, 0.5)"
+                      : "1px solid rgba(70, 180, 110, 0.5)",
+                    color: submissionError ? "#ff9999" : "#8ee0a8",
+                    fontSize: "13px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {submissionMessage}
+                </div>
+              )}
 
               <button
                 className="submit-btn"
                 onClick={submitOrder}
                 disabled={submitting}
+                aria-busy={submitting}
               >
-                {submitting ? "Submitting..." : "Submit Project Enquiry →"}
+                {submitting ? "Submitting your enquiry..." : "Submit Project Enquiry →"}
               </button>
 
               <small className="form-note">
