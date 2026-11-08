@@ -1081,3 +1081,24 @@ body,
   min-width: 0 !important;
   text-align: center !important;
 }
+/* Permanent mobile-safe Diwali greeting */
+.diwali-banner .diwali-marquee {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  overflow: hidden !important;
+}
+
+.diwali-banner .diwali-marquee span {
+  position: static !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  animation: none !important;
+  -webkit-animation: none !important;
+}
