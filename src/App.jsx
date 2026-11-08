@@ -127,6 +127,70 @@ function Home() {
 
   return (
     <div className="app">
+      {/* Diwali Special Banner */}
+      <style>{`
+        .diwali-banner {
+          width: 100%;
+          overflow: hidden;
+          padding: 13px 10px 11px;
+          text-align: center;
+          background: linear-gradient(90deg, #100b04, #241707, #100b04);
+          border-bottom: 1px solid rgba(214, 173, 85, 0.45);
+        }
+
+        .diwali-marquee {
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .diwali-marquee span {
+          display: inline-block;
+          padding-left: 100%;
+          color: #f5c96b;
+          font-size: 15px;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          animation: snDiwaliScroll 16s linear infinite;
+        }
+
+        .diwali-founder {
+          margin-top: 7px;
+          color: #f0d18b;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 2px;
+        }
+
+        @keyframes snDiwaliScroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .diwali-marquee span {
+            animation: none;
+            padding-left: 0;
+          }
+        }
+      `}</style>
+
+      <div className="diwali-banner">
+        <div className="diwali-marquee">
+          <span>
+            🪔 ✨ HAPPY DIWALI FROM OUR SN HUB ✨ 🪔
+          </span>
+        </div>
+
+        <div className="diwali-founder">
+          — Ganga Naik —
+        </div>
+      </div>
+
       <nav className="navbar">
         <Link to="/" className="brand" onClick={closeMenu}>
           <span className="brand-mark">SN</span>
