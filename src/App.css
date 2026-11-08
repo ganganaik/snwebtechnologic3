@@ -1046,3 +1046,38 @@ section {
     padding: 30px 17px;
   }
 }
+/* Final Diwali banner mobile width fix */
+html,
+body,
+#root,
+.app {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.diwali-banner {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  contain: layout paint !important;
+}
+
+.diwali-marquee {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.diwali-quote {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  text-align: center !important;
+}
