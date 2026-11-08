@@ -132,7 +132,7 @@ function Home() {
         .diwali-banner {
           width: 100%;
           overflow: hidden;
-          padding: 13px 10px 11px;
+          padding: 13px 10px 12px;
           text-align: center;
           background: linear-gradient(90deg, #100b04, #241707, #100b04);
           border-bottom: 1px solid rgba(214, 173, 85, 0.45);
@@ -154,12 +154,31 @@ function Home() {
           animation: snDiwaliScroll 16s linear infinite;
         }
 
-        .diwali-founder {
-          margin-top: 7px;
+        .diwali-quote {
+          margin: 9px auto 0;
           color: #f0d18b;
           font-size: 13px;
-          font-weight: 600;
-          letter-spacing: 2px;
+          line-height: 1.65;
+          font-weight: 500;
+          letter-spacing: 0.2px;
+        }
+
+        .diwali-gm {
+          margin-top: 8px;
+          color: #d6ad55;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          line-height: 1.1;
+        }
+
+        .diwali-founder {
+          margin-top: 1px;
+          color: #f5c96b;
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: 1.2px;
+          line-height: 1.2;
         }
 
         @keyframes snDiwaliScroll {
@@ -168,6 +187,16 @@ function Home() {
           }
           100% {
             transform: translateX(-100%);
+          }
+        }
+
+        @media (max-width: 520px) {
+          .diwali-marquee span {
+            font-size: 14px;
+          }
+
+          .diwali-quote {
+            font-size: 12px;
           }
         }
 
@@ -186,9 +215,15 @@ function Home() {
           </span>
         </div>
 
-        <div className="diwali-founder">
-          — Ganga Naik —
+        <div className="diwali-quote">
+          <div>Pane ko abhi kai mukaam baki hai</div>
+          <div>Iss khel ke kai imtehaan baki hai..</div>
+          <div>Abhi toh naapi hai apne mutthi bhar zameen</div>
+          <div>Abhi toh aage pura asman baki hai</div>
         </div>
+
+        <div className="diwali-gm">(GM)</div>
+        <div className="diwali-founder">- Ganga Naik -</div>
       </div>
 
       <nav className="navbar">
