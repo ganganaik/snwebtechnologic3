@@ -112,6 +112,28 @@ function CustomerChat() {
     return timestamp.toDate().toLocaleString();
   };
 
+  const renderMessageText = (text) => {
+    const parts = text.split(/(https?:\/\/[^\s]+)/g);
+
+    return parts.map((part, index) => {
+      if (/^https?:\/\//i.test(part)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.messageLink}
+          >
+            {part}
+          </a>
+        );
+      }
+
+      return part;
+    });
+  };
+
   return (
     <div style={styles.page}>
       <div style={styles.container}>
@@ -168,7 +190,9 @@ function CustomerChat() {
                       <span style={styles.sender}>
                         {isMine ? "You" : "SN Support"}
                       </span>
-                      <p style={styles.messageText}>{item.text}</p>
+                      <p style={styles.messageText}>
+                        {renderMessageText(item.text || "")}
+                      </p>
                       <span style={styles.time}>
                         {formatTime(item.createdAt)}
                       </span>
@@ -309,6 +333,11 @@ const styles = {
     lineHeight: 1.5,
     margin: "7px 0",
     whiteSpace: "pre-wrap",
+  },
+  messageLink: {
+    color: "#e5c45f",
+    textDecoration: "underline",
+    overflowWrap: "anywhere",
   },
   time: {
     color: "#aaa69d",
