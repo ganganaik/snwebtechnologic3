@@ -140,6 +140,12 @@ function AdminChats() {
     }
   };
 
+  const addTemplate = (text) => {
+    setMessage((previous) =>
+      previous.trim() ? `${previous}\n${text}` : text
+    );
+  };
+
   const formatTime = (timestamp) => {
     if (!timestamp?.toDate) return "Sending...";
     return timestamp.toDate().toLocaleString();
@@ -246,7 +252,9 @@ function AdminChats() {
                           <strong style={styles.sender}>
                             {isAdmin ? "You (Admin)" : "Customer"}
                           </strong>
-                          <p style={styles.messageText}>{item.text}</p>
+                          <p style={styles.messageText}>
+                            {item.text}
+                          </p>
                           <span style={styles.time}>
                             {formatTime(item.createdAt)}
                           </span>
@@ -257,12 +265,63 @@ function AdminChats() {
                 )}
               </div>
 
+              <div style={styles.quickActions}>
+                <button
+                  type="button"
+                  style={styles.quickButton}
+                  onClick={() =>
+                    addTemplate(
+                      "Payment Amount: ₹\nPlease confirm the amount before making payment."
+                    )
+                  }
+                >
+                  💰 Payment Amount
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.quickButton}
+                  onClick={() =>
+                    addTemplate(
+                      "Payment Details:\nUPI ID: gm627@ybl\nPlease verify that the recipient UPI ID is gm627@ybl before confirming your payment."
+                    )
+                  }
+                >
+                  📱 UPI Details
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.quickButton}
+                  onClick={() =>
+                    addTemplate(
+                      "Website / Project Link:\nPlease visit: "
+                    )
+                  }
+                >
+                  🔗 Website Link
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.quickButton}
+                  onClick={() =>
+                    addTemplate(
+                      "Delivery Details:\nProject Status: \nDelivery Date: \nAdditional Information: "
+                    )
+                  }
+                >
+                  📦 Delivery Details
+                </button>
+              </div>
+
               <form onSubmit={handleSend} style={styles.form}>
-                <input
+                <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Reply to customer..."
                   maxLength={2000}
+                  rows={3}
                   style={styles.input}
                   disabled={sending}
                 />
@@ -412,25 +471,44 @@ const styles = {
     lineHeight: 1.5,
     fontSize: "14px",
     margin: "7px 0",
+    overflowWrap: "anywhere",
   },
   time: {
     color: "#aaa69d",
     fontSize: "10px",
+  },
+  quickActions: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    padding: "12px 14px 0",
+  },
+  quickButton: {
+    background: "#211b0d",
+    color: "#e5c45f",
+    border: "1px solid #8b7130",
+    borderRadius: "7px",
+    padding: "9px 11px",
+    fontSize: "12px",
+    cursor: "pointer",
   },
   form: {
     display: "flex",
     gap: "10px",
     padding: "14px",
     borderTop: "1px solid #39301c",
+    alignItems: "stretch",
   },
   input: {
     flex: 1,
     minWidth: 0,
+    resize: "vertical",
     padding: "13px",
     background: "#080808",
     color: "#fff",
     border: "1px solid #514326",
     borderRadius: "8px",
+    fontFamily: "Arial, sans-serif",
   },
   sendButton: {
     padding: "12px 16px",
@@ -439,6 +517,8 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     fontWeight: "bold",
+    cursor: "pointer",
+    alignSelf: "flex-end",
   },
   empty: {
     margin: "auto",
