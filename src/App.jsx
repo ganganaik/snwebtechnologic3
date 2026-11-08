@@ -130,6 +130,8 @@ function Home() {
       <style>{`
         .diwali-banner {
           position: relative !important;
+          isolation: isolate !important;
+          z-index: 99999 !important;
           display: block !important;
           box-sizing: border-box !important;
           width: 100% !important;
@@ -229,6 +231,17 @@ function Home() {
             font-size: 12px;
             line-height: 1.7;
           }
+        }
+
+        .diwali-banner::before,
+        .diwali-banner::after {
+          content: none !important;
+          display: none !important;
+        }
+
+        .diwali-banner > * {
+          position: relative !important;
+          z-index: 1 !important;
         }
       `}</style>
 
