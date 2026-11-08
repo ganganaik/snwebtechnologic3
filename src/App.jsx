@@ -140,36 +140,46 @@ function Home() {
         }
 
         .diwali-marquee {
-          position: relative !important;
+          position: relative;
           display: block;
-          width: 100% !important;
+          width: 100%;
           height: 24px;
-          overflow: hidden !important;
+          overflow: hidden;
           white-space: nowrap;
         }
 
         .diwali-banner .diwali-marquee span {
-          position: absolute !important;
+          position: absolute;
           display: inline-block;
           top: 0;
-          left: 0 !important;
+          left: 100%;
           width: max-content;
-          padding-left: 0 !important;
+          padding-left: 0;
           color: #f5c96b;
           font-size: 15px;
           font-weight: 700;
           letter-spacing: 1.5px;
           line-height: 24px;
-          animation: snDiwaliStableScroll 18s linear infinite !important;
+          animation: snDiwaliStableScroll 18s linear infinite;
+          -webkit-animation: snDiwaliStableScroll 18s linear infinite;
           will-change: transform;
         }
 
         @keyframes snDiwaliStableScroll {
           from {
-            transform: translate3d(100vw, 0, 0);
+            transform: translateX(0);
           }
           to {
-            transform: translate3d(-100%, 0, 0);
+            transform: translateX(-100%);
+          }
+        }
+
+        @-webkit-keyframes snDiwaliStableScroll {
+          from {
+            -webkit-transform: translateX(0);
+          }
+          to {
+            -webkit-transform: translateX(-100%);
           }
         }
 
@@ -220,19 +230,15 @@ function Home() {
             font-size: 12px;
             line-height: 1.7;
           }
-
-          .diwali-gm,
-          .diwali-founder {
-            text-align: center;
-          }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .diwali-banner .diwali-marquee span {
-            animation: none !important;
-            left: 50% !important;
+            animation: none;
+            -webkit-animation: none;
+            left: 50%;
             transform: translateX(-50%);
-            padding-left: 0 !important;
+            -webkit-transform: translateX(-50%);
           }
         }
       `}</style>
