@@ -130,6 +130,7 @@ function Home() {
       {/* Diwali Special Banner */}
       <style>{`
         .diwali-banner {
+          box-sizing: border-box;
           width: 100%;
           overflow: hidden;
           padding: 13px 10px 12px;
@@ -139,28 +140,50 @@ function Home() {
         }
 
         .diwali-marquee {
-          width: 100%;
-          overflow: hidden;
+          position: relative !important;
+          display: block;
+          width: 100% !important;
+          height: 24px;
+          overflow: hidden !important;
           white-space: nowrap;
         }
 
-        .diwali-marquee span {
+        .diwali-banner .diwali-marquee span {
+          position: absolute !important;
           display: inline-block;
-          padding-left: 100%;
+          top: 0;
+          left: 0 !important;
+          width: max-content;
+          padding-left: 0 !important;
           color: #f5c96b;
           font-size: 15px;
           font-weight: 700;
           letter-spacing: 1.5px;
-          animation: snDiwaliScroll 16s linear infinite;
+          line-height: 24px;
+          animation: snDiwaliStableScroll 18s linear infinite !important;
+          will-change: transform;
+        }
+
+        @keyframes snDiwaliStableScroll {
+          from {
+            transform: translate3d(100vw, 0, 0);
+          }
+          to {
+            transform: translate3d(-100%, 0, 0);
+          }
         }
 
         .diwali-quote {
+          width: 100%;
+          box-sizing: border-box;
           margin: 9px auto 0;
           color: #f0d18b;
           font-size: 13px;
           line-height: 1.65;
           font-weight: 500;
           letter-spacing: 0.2px;
+          text-align: center;
+          overflow-wrap: break-word;
         }
 
         .diwali-gm {
@@ -170,6 +193,7 @@ function Home() {
           font-weight: 700;
           letter-spacing: 1px;
           line-height: 1.1;
+          text-align: center;
         }
 
         .diwali-founder {
@@ -179,31 +203,36 @@ function Home() {
           font-weight: 700;
           letter-spacing: 1.2px;
           line-height: 1.2;
-        }
-
-        @keyframes snDiwaliScroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
+          text-align: center;
         }
 
         @media (max-width: 520px) {
-          .diwali-marquee span {
+          .diwali-marquee {
+            height: 23px;
+          }
+
+          .diwali-banner .diwali-marquee span {
             font-size: 14px;
+            line-height: 23px;
           }
 
           .diwali-quote {
             font-size: 12px;
+            line-height: 1.7;
+          }
+
+          .diwali-gm,
+          .diwali-founder {
+            text-align: center;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .diwali-marquee span {
-            animation: none;
-            padding-left: 0;
+          .diwali-banner .diwali-marquee span {
+            animation: none !important;
+            left: 50% !important;
+            transform: translateX(-50%);
+            padding-left: 0 !important;
           }
         }
       `}</style>
